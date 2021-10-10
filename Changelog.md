@@ -4,7 +4,7 @@ OpenCore Changelog
 - Revised OpenLinuxBoot documentation
 - Supported Linux ostree boot layout
 - Fixed external drive icons for Boot Entry Protocol
-
+- 将OpenCanopy的默认资源层级减少更改为`Auto=Auto,Default,Default=Default`提升图形化加载能效
 #### v0.7.4
 - Fixed Linux kernel sort order
 - Added Linux detection optional log detail

@@ -432,12 +432,12 @@ InternalContextConstruct (
 
   if (AsciiStrCmp (Picker->PickerVariant, "Auto") == 0) {
     if (Context->BackgroundColor.Raw == APPLE_COLOR_LIGHT_GRAY) {
-      Context->Prefix = "Acidanthera\\Chardonnay";
+      Context->Prefix = "Auto";
     } else {
-      Context->Prefix = "Acidanthera\\GoldenGate";
+      Context->Prefix = "Default";
     }
   } else if (AsciiStrCmp (Picker->PickerVariant, "Default") == 0) {
-    Context->Prefix = "Acidanthera\\GoldenGate";
+    Context->Prefix = "Default";
   } else {
     Context->Prefix = Picker->PickerVariant;
   }
