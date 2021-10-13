@@ -60,7 +60,7 @@ jobs:
           file_glob: true
 
   build-windows:
-    name: Build Windows VS2019
+    name: Windows构建VS2019
     runs-on: windows-2022
     env:
       HAS_OPENSSL_BUILD: 0
@@ -77,7 +77,7 @@ jobs:
           choco install iasl --no-progress --version=2017.11.10
       - name: CI Bootstrap
         run: |
-          src=$(curl -Lfs https://raw.githubusercontent.com/wy41412/ocbuild/Yaming/ci-bootstrap.sh) && eval "$src" || exit 1
+          src=$(curl -Lfs https://raw.githubusercontent.com/wy414012/ocbuild/Yaming/ci-bootstrap.sh) && eval "$src" || exit 1
       - run: ./build_duet.tool
       - run: ./build_oc.tool
 
