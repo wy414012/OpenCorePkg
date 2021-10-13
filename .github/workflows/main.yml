@@ -17,7 +17,7 @@ env:
 jobs:
   build-macos:
     name: Build macOS XCODE5
-    runs-on: macos-latest
+    runs-on: macos-11
     env:
       JOB_TYPE: BUILD
     steps:
@@ -59,102 +59,7 @@ jobs:
           tag: ${{ github.ref }}
           file_glob: true
 
-  build-linux-clangpdb-gcc5:
-    name: Build Linux CLANGPDB/GCC5
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Install Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install nasm uuid-dev libssl-dev iasl
-          file="clang+llvm-9.0.1-x86_64-linux-gnu-ubuntu-16.04"
-          suf=".tar.xz"
-          curl -LO "https://github.com/llvm/llvm-project/releases/download/llvmorg-9.0.1/${file}${suf}" || exit 1
-          sum=$(shasum -a 256 "${file}${suf}" | cut -f1 -d' ')
-          expsum="1af280e96fec62acf5f3bb525e36baafe09f95f940dc9806e22809a83dfff4f8"
-          if [ "$sum" != "$expsum" ]; then echo "Invalid checksum $sum" ; exit 1 ; fi
-          tar -xf "${file}${suf}" || exit 1
-          echo "$(pwd)/${file}/bin" >> $GITHUB_PATH
-
-      - name: CI Bootstrap
-        run: |
-          src=$(/usr/bin/curl -Lfs https://raw.githubusercontent.com/acidanthera/ocbuild/master/ci-bootstrap.sh) && eval "$src" || exit 1
-
-      - run: ./build_duet.tool
-      - run: ./build_oc.tool
-
-      - name: Upload to Artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: Linux CLANGPDB-GCC5 Artifacts
-          path: Binaries/*.zip
-
-  build-linux-clang38:
-    name: Build Linux CLANG38
-    runs-on: ubuntu-latest
-    env:
-      TOOLCHAINS: CLANG38
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Install Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install nasm uuid-dev iasl clang-8 llvm-8-dev doxygen texlive texlive-latex-extra
-          echo "/usr/lib/llvm-8/bin" >> $GITHUB_PATH
-
-      - name: CI Bootstrap
-        run: |
-          src=$(/usr/bin/curl -Lfs https://raw.githubusercontent.com/acidanthera/ocbuild/master/ci-bootstrap.sh) && eval "$src" || exit 1
-
-      - run: ./build_duet.tool
-      - run: ./build_oc.tool
-
-      - name: Build Docs
-        run: |
-          abort() { tail -200 log.txt ; exit 1 ; }
-          doxygen Doxyfile &> log.txt || abort
-          cd Doxy/latex || abort
-          make pdf &> log.txt || abort
-
-      - name: Upload to Artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: Linux CLANG38 Artifacts
-          path: Binaries/*.zip
-
-  build-windows:
-    name: Build Windows VS2019
-    runs-on: windows-latest
-    env:
-      HAS_OPENSSL_BUILD: 0
-      CC: gcc
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Install Dependencies
-        run: |
-          choco install make nasm zip --no-progress
-          choco install iasl --no-progress --version=2017.11.10
-
-      - name: CI Bootstrap
-        run: |
-          src=$(curl -Lfs https://raw.githubusercontent.com/acidanthera/ocbuild/master/ci-bootstrap.sh) && eval "$src" || exit 1
-
-      - run: ./build_duet.tool
-      - run: ./build_oc.tool
-
-      - name: Upload to Artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: Windows Artifacts
-          path: Binaries/*.zip
-
+ 
   analyze-scripts:
     name: Analyze Scripts
     runs-on: macos-latest
@@ -207,10 +112,10 @@ jobs:
 
   analyze-coverity:
     name: Analyze Coverity
-    runs-on: macos-latest
+    runs-on: macos-11
     env:
       JOB_TYPE: COVERITY
-    if: github.repository_owner == 'acidanthera' && github.event_name != 'pull_request'
+    if: github.repository_owner == 'wy414012' && github.event_name != 'pull_request'
     steps:
       - uses: actions/checkout@v2
 
