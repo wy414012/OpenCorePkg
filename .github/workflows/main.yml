@@ -16,7 +16,7 @@ env:
 
 jobs:
   build-macos:
-    name: macOS XCODE5 构建
+    name: 使用macOS构建
     runs-on: macos-11
     env:
       JOB_TYPE: BUILD
@@ -26,13 +26,13 @@ jobs:
       - name: Add Linux Toolchain
         run: brew tap FiloSottile/homebrew-musl-cross
 
-      - name: Install Linux Toolchain
+      - name: 安装Linux工具链
         run: brew install musl-cross
         env:
           HOMEBREW_NO_INSTALL_CLEANUP: 1
           HOMEBREW_NO_AUTO_UPDATE: 1
 
-      - name: Install Dependencies
+      - name: 安装依赖
         run: brew install openssl mingw-w64
         env:
           HOMEBREW_NO_INSTALL_CLEANUP: 1
@@ -45,44 +45,8 @@ jobs:
       - run: ./build_duet.tool
       - run: ./build_oc.tool
 
-      - name: Upload to Artifacts
+      - name: 打包上传工作件
         uses: actions/upload-artifact@v2
         with:
-          name: macOS XCODE5 Artifacts
-          path: Binaries/*.zip
-      - name: Upload to Release
-        if: github.event_name == 'release'
-        uses: svenstaro/upload-release-action@e74ff71f7d8a4c4745b560a485cc5fdb9b5b999d
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: Binaries/*.zip
-          tag: ${{ github.ref }}
-          file_glob: true
-
-  build-windows:
-    name: Windows构建VS2019
-    runs-on: windows-2022
-    env:
-      HAS_OPENSSL_BUILD: 0
-      CC: gcc
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Install Dependencies
-        run: |
-          choco install make nasm zip --no-progress
-          choco install iasl --no-progress --version=2017.11.10
-      - name: CI Bootstrap
-        run: |
-          src=$(curl -Lfs https://raw.githubusercontent.com/wy414012/ocbuild/Yaming/ci-bootstrap.sh) && eval "$src" || exit 1
-      - run: ./build_duet.tool
-      - run: ./build_oc.tool
-
-      - name: Upload to Artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: Windows Artifacts
+          name: OpenCore_macOS_build
           path: Binaries/*.zip
