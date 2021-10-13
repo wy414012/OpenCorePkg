@@ -16,7 +16,7 @@ env:
 
 jobs:
   build-macos:
-    name: Build macOS XCODE5
+    name: macOS XCODE5 构建
     runs-on: macos-11
     env:
       JOB_TYPE: BUILD
@@ -59,5 +59,31 @@ jobs:
           tag: ${{ github.ref }}
           file_glob: true
 
- 
+ build-windows:
+   name: Windows构建 VS2019
+   runs-on: windows-2022
+   env:
+     HAS_OPENSSL_BUILD: 0
+     CC: gcc
+   defaults:
+     run:
+       shell: bash
+   steps:
+     - uses: actions/checkout@v2
+
+     - name: Install Dependencies
+       run: |
+         choco install make nasm zip --no-progress
+         choco install iasl --no-progress --version=2017.11.10
+     - name: CI Bootstrap
+       run: |
+         src=$(curl -Lfs https://raw.githubusercontent.com/wy414012/ocbuild/Yaming/ci-bootstrap.sh) && eval "$src" || exit 1
+     - run: ./build_duet.tool
+     - run: ./build_oc.tool
+
+     - name: Upload to Artifacts
+       uses: actions/upload-artifact@v2
+       with:
+         name: Windows Artifacts
+         path: Binaries/*.zip
 
