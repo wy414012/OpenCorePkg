@@ -16,17 +16,17 @@ env:
 
 jobs:
   build-macos:
-    name: 使用macOS构建
+    name: 使用macOS Xcode13.0构建
     runs-on: macos-11
     env:
       JOB_TYPE: BUILD
     steps:
       - uses: actions/checkout@v2
 
-      - name: Add Linux Toolchain
+      - name: 安装Linux工具链
         run: brew tap FiloSottile/homebrew-musl-cross
 
-      - name: 安装Linux工具链
+      - name: 安装Linux工具
         run: brew install musl-cross
         env:
           HOMEBREW_NO_INSTALL_CLEANUP: 1
@@ -51,11 +51,11 @@ jobs:
           name: OpenCore_macOS_build
           path: Binaries/*.zip
 
-      - name: 上传发布
+      - name: 上传发布版本
         if: github.event_name == 'release'
-        uses: JasonEtco/upload-to-release@master
+        uses: svenstaro/upload-release-action@483c1e56f95e88835747b1c7c60581215016cbf2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: Binaries/*.zip
+          file: build/*/*.zip
           tag: ${{ github.ref }}
           file_glob: true
