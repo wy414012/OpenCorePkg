@@ -59,3 +59,26 @@ jobs:
           file: Binaries/*.zip
           tag: ${{ github.ref }}
           file_glob: true
+  build-linux-clang:
+    name: Build Linux CLANG
+    runs-on: [self-hosted, linux, x64]
+    env:
+      TOOLCHAINS: CLANG
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: |
+          sudo dnf update -y
+
+      - name: CI Bootstrap
+        run: |
+          src=$(/usr/bin/curl -Lfs https://raw.githubusercontent.com/acidanthera/ocbuild/master/ci-bootstrap.sh) && eval "$src" || exit 1
+      - run: ./build_duet.tool
+      - run: ./build_oc.tool
+
+      - name: Upload to Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Linux CLANG38 Artifacts
+          path: Binaries/*.zip
