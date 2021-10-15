@@ -24,8 +24,6 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install nasm uuid-dev libssl-dev iasl
           file="clang+llvm-9.0.1-x86_64-linux-gnu-ubuntu-16.04"
           suf=".tar.xz"
           curl -LO "https://github.com/llvm/llvm-project/releases/download/llvmorg-9.0.1/${file}${suf}" || exit 1
