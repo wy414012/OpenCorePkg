@@ -34,8 +34,7 @@ jobs:
           echo "$(pwd)//bin" >> 
       - name: CI Bootstrap
         run: |
-          src=$(/usr/bin/curl -Lfs https://raw.githubusercontent.com/wy414012/ocbuild/yaming/ci-bootstrap.sh) && eval "$src" || exit 1
-		  
+          src=$(/usr/bin/curl -Lfs https://raw.githubusercontent.com/wy414012/ocbuild/yaming/ci-bootstrap.sh) && eval "$src" || exit 1 
 
       - run: ./build_oc.tool
 
