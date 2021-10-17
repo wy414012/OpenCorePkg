@@ -93,7 +93,8 @@ package() {
     "EFI/OC/Tools"
     "EFI/OC/Resources/Audio"
     "EFI/OC/Resources/Font"
-    "EFI/OC/Resources/Image"
+	"EFI/OC/Resources/Image/Auto"
+    "EFI/OC/Resources/Image/Default"
     "EFI/OC/Resources/Label"
     )
 
@@ -278,7 +279,7 @@ NO_ARCHIVES=0
 export SELFPKG
 export NO_ARCHIVES
 
-src=$(curl -Lfs https://raw.githubusercontent.com/acidanthera/ocbuild/master/efibuild.sh) && eval "$src" || exit 1
+src=$(curl -Lfs https://raw.githubusercontent.com/wy414012/ocbuild/Yaming/efibuild.sh) && eval "$src" || exit 1
 
 cd Library/OcConfigurationLib || exit 1
 ./CheckSchema.py OcConfigurationLib.c || exit 1

@@ -5,8 +5,9 @@ OpenCore Changelog
 - Supported Linux ostree boot layout
 - Fixed external drive icons for Boot Entry Protocol
 - Added GPU Resize BAR quirks to reduce BARs on per-OS basis
-- 将OpenCanopy的默认资源层级减少更改为`Auto=Auto,Default,Default=Default`提升图形化加载能效
+- 将OpenCanopy的默认资源层级减少更改为`Auto=Auto,Default  Default=Default`提升图形化加载能效
 - 更新CI将默认编译xcode12.2提升到13.0
+- 添加缺失的默认图形资源存储目录
 
 #### v0.7.4
 - Fixed Linux kernel sort order
