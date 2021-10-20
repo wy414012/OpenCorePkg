@@ -1,7 +1,7 @@
 BIOSVendor: "Apple Inc."
-BIOSVersion: "1715.40.12.0.0"
-BIOSLegacyVersion: "MBP151.88Z.F000.B00.2109052151"
-BIOSReleaseDate: "09/05/2021"
+BIOSVersion: "1715.40.15.0.0"
+BIOSLegacyVersion: "MBP151.88Z.F000.B00.2110032010"
+BIOSReleaseDate: "10/03/2021"
 SystemManufacturer: "Apple Inc."
 SystemProductName: "MacBookPro15,1"
 SystemVersion: "1.0"
@@ -50,12 +50,12 @@ SmcPlatform:
   - 0x00
 OEMStrings: |-
   Apple ROM Version
-    BIOS ID:      MBP151.88Z.F000.B00.2109052151
+    BIOS ID:      MBP151.88Z.F000.B00.2110032010
     Model:        MBP151
-    EFI Version:  1715.40.12.0.0
-    Built by:     root@bb-g9-pdb4
-    Date:         Sun Sep  5 21:51:03 2021
-    Revision:     1715.40.12 (B&I)
+    EFI Version:  1715.40.15.0.0
+    Built by:     root@bb-g9-pdb19
+    Date:         Sun Oct  3 20:10:53 2021
+    Revision:     1715.40.15 (B&I)
     ROM Version:  F000_B00
     Build Type:   Official Build, RELEASE
     Compiler:     clang-1300.0.29.1
