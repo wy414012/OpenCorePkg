@@ -59,8 +59,8 @@ OEMStrings: |-
     ROM Version:  F000_B00
     Build Type:   Official Build, RELEASE
     Compiler:     clang-1300.0.29.1
-    UUID:         A59580BF-37FC-3774-9E56-1A03107D9C10
-    UUID:         778A5A4F-80DB-3DD3-A1DA-53FB063BE3C2
+    UUID:         BBB858E4-942C-332B-98BA-21FC42BD2902
+    UUID:         63AB3533-5DF2-3F03-8300-38AC300BA305
 Specifications:
   CPUCodename:
     - "Coffee Lake"

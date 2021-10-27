@@ -81,8 +81,8 @@ OEMStrings: |-
     ROM Version:  F000_B00
     Build Type:   Official Build, RELEASE
     Compiler:     clang-1300.0.29.1
-    UUID:         DCD1C6ED-F1F9-3985-8504-3845333771FC
-    UUID:         DE083ED9-11CA-3164-BFD7-F80E9BC0C457
+    UUID:         1506C6B2-3198-3E50-A809-13A03AEF11B8
+    UUID:         F0B0BE34-D1CC-3766-ACBC-35DCBE894F83
 Specifications:
   CPUCodename:
     - "Kaby Lake"
@@ -210,6 +210,5 @@ AppleBoardCode:
 AppleModelYear:
   - 2017
   - 2018
-CloverSerialNumber: "C02TQHACHTD5"
 MinimumOSVersion: "10.12.5"
 MaximumOSVersion: null

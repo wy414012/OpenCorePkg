@@ -251,8 +251,6 @@ AppleModelYear:
   - 2018
   - 2019
   - 2020
-# Optional, override for SystemSerialNumber for Clover
-CloverSerialNumber: "C02X1HACJHCD"
 MinimumOSVersion: "10.13.6"
 MaximumOSVersion: null
 AppleModelId: "J132"

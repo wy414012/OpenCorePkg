@@ -66,14 +66,14 @@ SmcPlatform:
 SmcEPCI: 0x00F01008
 OEMStrings: |-
   Apple ROM Version
-  Model:        MBP121
-  EFI Version:  428.40.10.0.0
-  Built by:     root@bb-g9-pdb136
-  Date:         Sat Sep 25 05:28:09 PDT 2021
-  Revision:     428.40.10 (B&I)
-  ROM Version:  F000_B00
-  Build Type:   Official Build, Release
-  Compiler:     clang-1300.0.29.1
+    Model:        MBP121
+    EFI Version:  428.40.10.0.0
+    Built by:     root@bb-g9-pdb136
+    Date:         Sat Sep 25 05:28:09 PDT 2021
+    Revision:     428.40.10 (B&I)
+    ROM Version:  F000_B00
+    Build Type:   Official Build, Release
+    Compiler:     clang-1300.0.29.1
 Specifications:
   CPUCodename:
     - "Broadwell"

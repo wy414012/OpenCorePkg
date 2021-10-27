@@ -73,14 +73,14 @@ SmcPlatform:
 SmcEPCI: 0xF00008
 OEMStrings: |-
   Apple ROM Version
-  Model:        IM161
-  EFI Version:  428.40.10.0.0
-  Built by:     root@bb-g8-pdb99
-  Date:         Sat Sep 25 05:32:28 PDT 2021
-  Revision:     428.40.10 (B&I)
-  ROM Version:  F000_B00
-  Build Type:   Official Build, Release
-  Compiler:     clang-1300.0.29.1
+    Model:        IM161
+    EFI Version:  428.40.10.0.0
+    Built by:     root@bb-g8-pdb99
+    Date:         Sat Sep 25 05:32:28 PDT 2021
+    Revision:     428.40.10 (B&I)
+    ROM Version:  F000_B00
+    Build Type:   Official Build, Release
+    Compiler:     clang-1300.0.29.1
 Specifications:
   CPUCodename:
     - "Broadwell"
@@ -183,6 +183,5 @@ AppleModelYear:
   - 2015
   - 2016
   - 2017
-CloverSerialNumber: "C02QQHACGF1J"
 MinimumOSVersion: "10.11"
 MaximumOSVersion: null

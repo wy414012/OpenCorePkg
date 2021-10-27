@@ -54,17 +54,17 @@ SmcPlatform:
   - 0x00
 OEMStrings: |-
   Apple ROM Version
-  BIOS ID:      IM201.88Z.F000.B00.2110032038
-  Model:        IM201
-  EFI Version:  1715.40.15.0.0
-  Built by:     root@bb-g9-pdb19
-  Date:         Sun Oct  3 20:38:20 2021
-  Revision:     1715.40.15 (B&I)
-  ROM Version:  F000_B00
-  Build Type:   Official Build, RELEASE
-  Compiler:     clang-1300.0.29.1
-  UUID:         AE228DDB-6348-33A7-9676-34589F59DDA4
-  UUID:         18D36883-460E-3808-B747-E572E2BFA3DD
+    BIOS ID:      IM201.88Z.F000.B00.2110032038
+    Model:        IM201
+    EFI Version:  1715.40.15.0.0
+    Built by:     root@bb-g9-pdb19
+    Date:         Sun Oct  3 20:38:20 2021
+    Revision:     1715.40.15 (B&I)
+    ROM Version:  F000_B00
+    Build Type:   Official Build, RELEASE
+    Compiler:     clang-1300.0.29.1
+    UUID:         AE228DDB-6348-33A7-9676-34589F59DDA4
+    UUID:         18D36883-460E-3808-B747-E572E2BFA3DD
 Specifications:
   CPUCodename:
     - "Comet Lake"

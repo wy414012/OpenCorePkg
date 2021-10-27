@@ -67,17 +67,17 @@ SmcPlatform:
 SmcEPCI: 0xF02009
 OEMStrings: |-
   Apple ROM Version
-  BIOS ID:      MBP131.88Z.F000.B00.2109250319
-  Model:        MBP131
-  EFI Version:  447.40.12.0.0
-  Built by:     root@bb-g8-pdb53
-  Date:         Sat Sep 25 03:19:58 2021
-  Revision:     447.40.12 (B&I)
-  ROM Version:  F000_B00
-  Build Type:   Official Build, RELEASE
-  Compiler:     clang-1300.0.29.1
-  UUID:         BDBB0E80-4D4A-3F6F-927A-3BF30DE4B9E2
-  UUID:         F0B0BE34-D1CC-3766-ACBC-35DCBE894F83
+    BIOS ID:      MBP131.88Z.F000.B00.2109250319
+    Model:        MBP131
+    EFI Version:  447.40.12.0.0
+    Built by:     root@bb-g8-pdb53
+    Date:         Sat Sep 25 03:19:58 2021
+    Revision:     447.40.12 (B&I)
+    ROM Version:  F000_B00
+    Build Type:   Official Build, RELEASE
+    Compiler:     clang-1300.0.29.1
+    UUID:         BDBB0E80-4D4A-3F6F-927A-3BF30DE4B9E2
+    UUID:         F0B0BE34-D1CC-3766-ACBC-35DCBE894F83
 Specifications:
   CPUCodename:
     - "Skylake"
