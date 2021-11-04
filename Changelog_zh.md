@@ -1,12 +1,18 @@
 OpenCore Changelog
 ==================
+#### v0.7.6
+
 #### v0.7.5
-- Revised OpenLinuxBoot documentation
-- Supported Linux ostree boot layout
-- Fixed external drive icons for Boot Entry Protocol
-- Added GPU Resize BAR quirks to reduce BARs on per-OS basis
+- 修订了 OpenLinuxBoot 文档
+- 支持 Linux ostree 引导布局
+- 修复了引导进入协议的外部驱动器图标
+- 添加了 GPU Resize BAR 怪癖以减少每个操作系统的 BAR
+- 修复了正确检测某些发行版后 OpenLinuxBoot 挂起的错误
+- 下载时添加DMG签名检查，感谢@jspraul和@zhangyoufu
+- 更新了 SMBIOS 和其余部分的内置固件版本
+- 更新了恢复下载命令以包括 macOS 11 和 12
 - 将OpenCanopy的默认资源层级减少更改为`Auto=Auto,Default  Default=Default`提升图形化加载能效
-- 更新CI将默认编译xcode12.2提升到13.0
+- 更新CI将默认编译xcode12.2提升到13.1
 - 添加缺失的默认图形资源存储目录
 
 #### v0.7.4
