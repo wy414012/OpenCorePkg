@@ -83,7 +83,7 @@ jobs:
       - run: ./build_duet.tool
       - run: ./build_oc.tool
 
-      - name: Upload to Artifacts
+      - name: 打包上传构建工件
         uses: actions/upload-artifact@v2
         with:
           name: OpenCore_Linux_build
@@ -96,3 +96,39 @@ jobs:
           file: Binaries/*.zip
           tag: ${{ github.ref }}
           file_glob: true
+  build-linux-clang38:
+    name: 使用Linux Clang38构建
+    runs-on: ubuntu-latest
+    env:
+      TOOLCHAINS: CLANG38
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install nasm uuid-dev iasl doxygen texlive texlive-latex-extra
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 13
+          echo "/usr/lib/llvm-13/bin" >> $GITHUB_PATH
+
+      - name: CI Bootstrap
+        run: |
+          src=$(/usr/bin/curl -Lfs https://raw.githubusercontent.com/acidanthera/ocbuild/master/ci-bootstrap.sh) && eval "$src" || exit 1
+
+      - run: ./build_duet.tool
+      - run: ./build_oc.tool
+
+      - name: Build Docs
+        run: |
+          abort() { tail -200 log.txt ; exit 1 ; }
+          doxygen Doxyfile &> log.txt || abort
+          cd Doxy/latex || abort
+          make pdf &> log.txt || abort
+
+      - name: 打包上传构建工件
+        uses: actions/upload-artifact@v2
+        with:
+          name: Linux-clang38-build
+          path: Binaries/*.zip

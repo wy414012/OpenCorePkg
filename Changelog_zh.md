@@ -1,7 +1,8 @@
 OpenCore Changelog
 ==================
 #### v0.7.6
-
+- 添加构建环境，处理与主分支冲突
+- 
 #### v0.7.5
 - 修订了 OpenLinuxBoot 文档
 - 支持 Linux ostree 引导布局
