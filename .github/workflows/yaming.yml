@@ -16,7 +16,7 @@ env:
 
 jobs:
   build-macos:
-    name: 使用macOS Xcode13.0构建
+    name: 使用macOS Xcode13.1构建
     runs-on: macos-11
     env:
       JOB_TYPE: BUILD
@@ -104,7 +104,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install Dependencies
+      - name: 安装依赖
         run: |
           sudo apt-get update
           sudo apt-get install nasm uuid-dev iasl doxygen texlive texlive-latex-extra
@@ -115,7 +115,7 @@ jobs:
 
       - name: CI Bootstrap
         run: |
-          src=$(/usr/bin/curl -Lfs https://raw.githubusercontent.com/acidanthera/ocbuild/master/ci-bootstrap.sh) && eval "$src" || exit 1
+          src=$(/usr/bin/curl -Lfs https://raw.githubusercontent.com/wy414012/ocbuild/Yaming/ci-bootstrap.sh) && eval "$src" || exit 1
 
       - run: ./build_duet.tool
       - run: ./build_oc.tool
@@ -130,5 +130,5 @@ jobs:
       - name: 打包上传构建工件
         uses: actions/upload-artifact@v2
         with:
-          name: Linux-clang38-build
+          name: OpenCore-Linux-clang38-build
           path: Binaries/*.zip
