@@ -1,7 +1,6 @@
-%\documentclass[]{article}
-%\usepackage{xeCJK}
-\documentclass[UTF8]{ctexart}
-\usepackage{fontspec}
+\documentclass[]{article}
+
+\usepackage[UTF8]{ctex}
 \usepackage{lmodern}
 \usepackage{amssymb,amsmath}
 \usepackage{ifxetex,ifluatex}
@@ -115,27 +114,37 @@
 
 \tableofcontents
 
-\section{Introduction}\label{introduction}
+\section{介绍}\label{介绍}
 
 本文件提供了有关格式的信息
-\href{https://github.com/acidanthera/OpenCorePkg}{OpenCore} 用户用于设置 macOS 正确运行的配置文件操作系统。 它应被理解为对预期的官方澄清OpenCore 行为。 所有偏差，如果在已发布的 OpenCore 版本中发现，
-应被视为文件或实施问题，应通过报告 \href{https://github.com/acidanthera/bugtracker}{Acidanthera Bugtracker}.
-勘误表可在\href{https://github.com/acidanthera/OpenCorePkg/blob/master/Docs/Errata/Errata.pdf}{OpenCorePkg repository}.
+\href{https://github.com/acidanthera/OpenCorePkg}{OpenCore} 用户用于设置 macOS 正确运行的配置文件操作系统。 它应被理解为对预期的官方澄清
+OpenCore 行为。 所有偏差，如果在已发布的 OpenCore 版本中发现，应被视为文件或实施问题，应通过报告 \href{https://github.com/acidanthera/bugtracker}{Acidanthera Bugtracker}.
+勘误表可在
+\href{https://github.com/acidanthera/OpenCorePkg/blob/master/Docs/Errata/Errata.pdf}{OpenCorePkg repository}.
 
-本文档被构造为规范，并不旨在提供逐步配置最终用户板级支持包 (BSP) 的指南。 目标受众预计该文档是对 macOS 内部结构有基本了解的程序员和工程师
-和 UEFI 功能。 由于这些原因，本文档仅提供英文版本，本文件的所有其他来源或翻译都是非官方的，可能包含错误。
+本文档被构造为规范，并不旨在提供逐步
+配置最终用户板级支持包 (BSP) 的指南。 目标受众
+预计该文档是对 macOS 内部结构有基本了解的程序员和工程师
+和 UEFI 功能。 由于这些原因，本文档仅提供英文版本，
+本文件的所有其他来源或翻译都是非官方的，可能
+包含错误。
 
-第三方文章、实用程序、书籍和类似内容可能对更广泛的受众更有用，因为他们可以提供类似指南的材料。 然而，它们受制于作者的偏好，对本文档的误解，以及不可避免的过时。
+第三方文章、实用程序、书籍和类似内容可能对更广泛的受众更有用，因为
+他们可以提供类似指南的材料。 然而，它们受制于作者的偏好，
+对本文档的误解，以及不可避免的过时。
 在使用此类来源的情况下，例如 \href{https://dortania.github.io}{Dortania}'s
-\href{https://dortania.github.io/OpenCore-Install-Guide}{OpenCore 安装指南}
-和 \href{https://dortania.github.io/getting-started}{相关资料},
+\href{https://dortania.github.io/OpenCore-Install-Guide}{OpenCore Install Guide}
+和 \href{https://dortania.github.io/getting-started}{related material},
 请在做出的每项决定中重新参考本文件并重新评估潜在影响。
 
-请注意，无论使用何种来源，用户都必须完全理解每一个OpenCore 配置选项，以及它们背后的原则，在将问题发布到
+请注意，无论使用何种来源，用户都必须完全理解每一个
+OpenCore 配置选项，以及它们背后的原则，在将问题发布到
 \href{https://github.com/acidanthera/bugtracker}{Acidanthera Bugtracker}.
 
-\emph{Note}: 如果没有宝贵的意见，就不可能创建此文档其他人的贡献：Andrey1970、Goldfish64、dakanji、PMheart 和其他几个人，
-完整列表可在\href{https://github.com/acidanthera/OpenCorePkg/commits/master/Docs}{OpenCorePkg history}.
+\emph{Note}: 如果没有宝贵的意见，就不可能创建此文档
+其他人的贡献: Andrey1970, Goldfish64, dakanji, PMheart, and several others,
+完整列表可在
+\href{https://github.com/acidanthera/OpenCorePkg/commits/master/Docs}{OpenCorePkg history}.
 
 \subsection{Generic Terms}\label{generic-terms}
 
@@ -804,7 +813,7 @@ such as \href{https://dortania.github.io/builds}{Dortania}, may also be useful.
 
 \section{ACPI}\label{acpi}
 
-\subsection{Introduction}\label{acpiintro}
+\subsection{介绍}\label{acpiintro}
 
 ACPI (Advanced Configuration and Power Interface) is an open standard to
 discover and configure computer hardware.
@@ -1219,7 +1228,7 @@ patching or the padding of \texttt{NOP} to the remaining area could be considere
 
 \section{Booter}\label{booter}
 
-\subsection{Introduction}\label{booterintro}
+\subsection{介绍}\label{booterintro}
 
 This section allows the application of different types of UEFI modifications to
 operating system bootloaders, primarily the Apple bootloader (\texttt{boot.efi}).
@@ -1796,7 +1805,7 @@ To view their current state, use the \texttt{pmset -g} command in Terminal.
 
 \section{DeviceProperties}\label{devprops}
 
-\subsection{Introduction}\label{devpropsintro}
+\subsection{介绍}\label{devpropsintro}
 
 Device configuration is provided to macOS with a dedicated buffer,
 called \texttt{EfiDevicePathPropertyDatabase}. This buffer is a serialised
@@ -1910,7 +1919,7 @@ Some known properties include:
 
 \section{Kernel}\label{kernel}
 
-\subsection{Introduction}\label{kernelintro}
+\subsection{介绍}\label{kernelintro}
 
 This section allows the application of different kinds of kernelspace modifications on
 Apple Kernel (\href{https://opensource.apple.com/source/xnu}{XNU}). The modifications
@@ -2914,7 +2923,7 @@ to install and troubleshoot such macOS installations.
 
 \section{Misc}\label{misc}
 
-\subsection{Introduction}\label{miscintro}
+\subsection{介绍}\label{miscintro}
 
 This section contains miscellaneous configuration options affecting OpenCore operating system
 loading behaviour in addition to other options that do not readily fit into other sections.
@@ -4375,7 +4384,7 @@ rm vault.pub
 
 \section{NVRAM}\label{nvram}
 
-\subsection{Introduction}\label{nvramintro}
+\subsection{介绍}\label{nvramintro}
 
 This section allows setting non-volatile UEFI variables commonly described
 as NVRAM variables. Refer to \texttt{man\ nvram} for details.
@@ -4714,7 +4723,7 @@ troubleshooting:
   \end{itemize}
 
   In 10.15, debugging support was defective up to the 10.15.4 release due to
-  refactoring issues as well as the introduction of a
+  refactoring issues as well as the 介绍 of a
   \href{https://github.com/acidanthera/OpenCorePkg/blob/master/Include/Apple/Protocol/AppleDebugLog.h}{new debug protocol}.
   Some of the arguments and their values below may not be valid for versions prior
   to 10.15.4. The list of known arguments is covered below:
@@ -5948,7 +5957,7 @@ Apple ROM Version
 
 \section{UEFI}\label{uefi}
 
-\subsection{Introduction}\label{uefiintro}
+\subsection{介绍}\label{uefiintro}
 
 \href{https://uefi.org/specifications}{UEFI} (Unified Extensible Firmware Interface)
 is a specification that defines a software interface between an operating system and
