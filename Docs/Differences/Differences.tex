@@ -1,11 +1,8 @@
 \documentclass[]{article}
 %DIF LATEXDIFF DIFFERENCE FILE
 %DIF DEL PreviousConfiguration.tex   Thu Nov 11 11:18:49 2021
-%DIF ADD ../Configuration_zh.tex     Thu Nov 11 17:50:20 2021
+%DIF ADD ../Configuration.tex        Thu Nov 11 16:54:50 2021
 
-%DIF 3a3
-\usepackage[UTF8]{ctex} %DIF > 
-%DIF -------
 \usepackage{lmodern}
 \usepackage{amssymb,amsmath}
 \usepackage{ifxetex,ifluatex}
@@ -157,7 +154,7 @@
 
        \vspace{0.2in}
 
-       \DIFdelbegin \DIFdel{Reference Manual }\DIFdelend \DIFaddbegin \DIFadd{参考 手册 }\DIFaddend (0.7\DIFdelbegin \DIFdel{.5}\DIFdelend \DIFaddbegin \DIFadd{.6}\DIFaddend )
+       Reference Manual (0.7\DIFdelbegin \DIFdel{.5}\DIFdelend \DIFaddbegin \DIFadd{.6}\DIFaddend )
 
        \vspace{0.2in}
 
@@ -176,62 +173,41 @@
 
 \tableofcontents
 
-\section{\DIFdelbegin \DIFdel{Introduction}\DIFdelend \DIFaddbegin \DIFadd{介绍}\DIFaddend }\DIFdelbegin %DIFDELCMD < \label{introduction}
-%DIFDELCMD < %%%
-\DIFdelend \DIFaddbegin \label{介绍}
-\DIFaddend 
+\section{Introduction}\label{introduction}
 
-\DIFdelbegin \DIFdel{This document provides information on the format of the
-}\DIFdelend \DIFaddbegin \DIFadd{本文件提供了有关格式的信息
-}\DIFaddend \href{https://github.com/acidanthera/OpenCorePkg}{OpenCore} \DIFdelbegin \DIFdel{user
-configuration file used to set up the correct functioning of the macOS operating system. It is to be read as the official clarification of expected
+This document provides information on the format of the
+\href{https://github.com/acidanthera/OpenCorePkg}{OpenCore} user
+configuration file used to set up the correct functioning of the macOS
+operating system. It is to be read as the official clarification of expected
 OpenCore behaviour. All deviations, if found in published OpenCore releases,
 shall be considered to be documentation or implementation issues which should be
-reported via the }\DIFdelend \DIFaddbegin \DIFadd{用户用于设置 macOS 正确运行的配置文件操作系统。 它应被理解为对预期的官方澄清
-OpenCore 行为。 所有偏差，如果在已发布的 OpenCore 版本中发现，应被视为文件或实施问题，应通过报告 }\DIFaddend \href{https://github.com/acidanthera/bugtracker}{Acidanthera Bugtracker}.
-\DIFdelbegin \DIFdel{An errata sheet is available in
-}\DIFdelend \DIFaddbegin \DIFadd{勘误表可在
-}\DIFaddend \href{https://github.com/acidanthera/OpenCorePkg/blob/master/Docs/Errata/Errata.pdf}{OpenCorePkg repository}.
+reported via the \href{https://github.com/acidanthera/bugtracker}{Acidanthera Bugtracker}.
+An errata sheet is available in
+\href{https://github.com/acidanthera/OpenCorePkg/blob/master/Docs/Errata/Errata.pdf}{OpenCorePkg repository}.
 
-\DIFdelbegin \DIFdel{This document is structured as a specification and is not meant to provide a step-by-step
-guide to configuring an end-user Board Support Package }\DIFdelend \DIFaddbegin \DIFadd{本文档被构造为规范，并不旨在提供逐步
-配置最终用户板级支持包 }\DIFaddend (BSP) \DIFdelbegin \DIFdel{. The intended audience
+This document is structured as a specification and is not meant to provide a step-by-step
+guide to configuring an end-user Board Support Package (BSP). The intended audience
 of the document is anticipated to be programmers and engineers with a basic understanding of macOS internals
 and UEFI functionality. For these reasons, this document is available exclusively in English,
 and all other sources or translations of this document are unofficial and may
 contain errors.
-}\DIFdelend \DIFaddbegin \DIFadd{的指南。 目标受众
-预计该文档是对 macOS 内部结构有基本了解的程序员和工程师
-和 UEFI 功能。 由于这些原因，本文档仅提供英文版本，
-本文件的所有其他来源或翻译都是非官方的，可能
-包含错误。
-}\DIFaddend 
 
-\DIFdelbegin \DIFdel{Third-party articles, utilities, books, and similar, may be more useful for a wider audience as
+Third-party articles, utilities, books, and similar, may be more useful for a wider audience as
 they could provide guide-like material. However, they are subject to their authors' preferences,
 misinterpretations of this document, and unavoidable obsolescence.
-In cases of using such sources, such as }\DIFdelend \DIFaddbegin \DIFadd{第三方文章、实用程序、书籍和类似内容可能对更广泛的受众更有用，因为
-他们可以提供类似指南的材料。 然而，它们受制于作者的偏好，
-对本文档的误解，以及不可避免的过时。
-在使用此类来源的情况下，例如 }\DIFaddend \href{https://dortania.github.io}{Dortania}'s
+In cases of using such sources, such as \href{https://dortania.github.io}{Dortania}'s
 \href{https://dortania.github.io/OpenCore-Install-Guide}{OpenCore Install Guide}
-\DIFdelbegin \DIFdel{and }\DIFdelend \DIFaddbegin \DIFadd{和 }\DIFaddend \href{https://dortania.github.io/getting-started}{related material},
-\DIFdelbegin \DIFdel{please refer back to this document on every decision made and re-evaluate potential implications.
-}\DIFdelend \DIFaddbegin \DIFadd{请在做出的每项决定中重新参考本文件并重新评估潜在影响。
-}\DIFaddend 
+and \href{https://dortania.github.io/getting-started}{related material},
+please refer back to this document on every decision made and re-evaluate potential implications.
 
-\DIFdelbegin \DIFdel{Please note that regardless of the sources used, users are required to fully understand every
+Please note that regardless of the sources used, users are required to fully understand every
 OpenCore configuration option, and the principles behind them, before posting issues to the
-}\DIFdelend \DIFaddbegin \DIFadd{请注意，无论使用何种来源，用户都必须完全理解每一个
-OpenCore 配置选项，以及它们背后的原则，在将问题发布到
-}\DIFaddend \href{https://github.com/acidanthera/bugtracker}{Acidanthera Bugtracker}.
+\href{https://github.com/acidanthera/bugtracker}{Acidanthera Bugtracker}.
 
-\emph{Note}: \DIFdelbegin \DIFdel{Creating this document would not have been possible without the invaluable
-contributions from other people}\DIFdelend \DIFaddbegin \DIFadd{如果没有宝贵的意见，就不可能创建此文档
-其他人的贡献}\DIFaddend : Andrey1970, Goldfish64, dakanji, PMheart, and several others,
-\DIFdelbegin \DIFdel{with the full list available in
-}\DIFdelend \DIFaddbegin \DIFadd{完整列表可在
-}\DIFaddend \href{https://github.com/acidanthera/OpenCorePkg/commits/master/Docs}{OpenCorePkg history}.
+\emph{Note}: Creating this document would not have been possible without the invaluable
+contributions from other people: Andrey1970, Goldfish64, dakanji, PMheart, and several others,
+with the full list available in
+\href{https://github.com/acidanthera/OpenCorePkg/commits/master/Docs}{OpenCorePkg history}.
 
 \subsection{Generic Terms}\label{generic-terms}
 
@@ -900,7 +876,7 @@ such as \href{https://dortania.github.io/builds}{Dortania}, may also be useful.
 
 \section{ACPI}\label{acpi}
 
-\subsection{\DIFdelbegin \DIFdel{Introduction}\DIFdelend \DIFaddbegin \DIFadd{介绍}\DIFaddend }\label{acpiintro}
+\subsection{Introduction}\label{acpiintro}
 
 ACPI (Advanced Configuration and Power Interface) is an open standard to
 discover and configure computer hardware.
@@ -1315,7 +1291,7 @@ patching or the padding of \texttt{NOP} to the remaining area could be considere
 
 \section{Booter}\label{booter}
 
-\subsection{\DIFdelbegin \DIFdel{Introduction}\DIFdelend \DIFaddbegin \DIFadd{介绍}\DIFaddend }\label{booterintro}
+\subsection{Introduction}\label{booterintro}
 
 This section allows the application of different types of UEFI modifications to
 operating system bootloaders, primarily the Apple bootloader (\texttt{boot.efi}).
@@ -1906,7 +1882,7 @@ To view their current state, use the \texttt{pmset -g} command in Terminal.
 
 \section{DeviceProperties}\label{devprops}
 
-\subsection{\DIFdelbegin \DIFdel{Introduction}\DIFdelend \DIFaddbegin \DIFadd{介绍}\DIFaddend }\label{devpropsintro}
+\subsection{Introduction}\label{devpropsintro}
 
 Device configuration is provided to macOS with a dedicated buffer,
 called \texttt{EfiDevicePathPropertyDatabase}. This buffer is a serialised
@@ -2020,7 +1996,7 @@ Some known properties include:
 
 \section{Kernel}\label{kernel}
 
-\subsection{\DIFdelbegin \DIFdel{Introduction}\DIFdelend \DIFaddbegin \DIFadd{介绍}\DIFaddend }\label{kernelintro}
+\subsection{Introduction}\label{kernelintro}
 
 This section allows the application of different kinds of kernelspace modifications on
 Apple Kernel (\href{https://opensource.apple.com/source/xnu}{XNU}). The modifications
@@ -3024,7 +3000,7 @@ to install and troubleshoot such macOS installations.
 
 \section{Misc}\label{misc}
 
-\subsection{\DIFdelbegin \DIFdel{Introduction}\DIFdelend \DIFaddbegin \DIFadd{介绍}\DIFaddend }\label{miscintro}
+\subsection{Introduction}\label{miscintro}
 
 This section contains miscellaneous configuration options affecting OpenCore operating system
 loading behaviour in addition to other options that do not readily fit into other sections.
@@ -4485,7 +4461,7 @@ rm vault.pub
 
 \section{NVRAM}\label{nvram}
 
-\subsection{\DIFdelbegin \DIFdel{Introduction}\DIFdelend \DIFaddbegin \DIFadd{介绍}\DIFaddend }\label{nvramintro}
+\subsection{Introduction}\label{nvramintro}
 
 This section allows setting non-volatile UEFI variables commonly described
 as NVRAM variables. Refer to \texttt{man\ nvram} for details.
@@ -4824,7 +4800,7 @@ troubleshooting:
   \end{itemize}
 
   In 10.15, debugging support was defective up to the 10.15.4 release due to
-  refactoring issues as well as the \DIFdelbegin \DIFdel{introduction }\DIFdelend \DIFaddbegin \DIFadd{介绍 }\DIFaddend of a
+  refactoring issues as well as the introduction of a
   \href{https://github.com/acidanthera/OpenCorePkg/blob/master/Include/Apple/Protocol/AppleDebugLog.h}{new debug protocol}.
   Some of the arguments and their values below may not be valid for versions prior
   to 10.15.4. The list of known arguments is covered below:
@@ -6058,7 +6034,7 @@ Apple ROM Version
 
 \section{UEFI}\label{uefi}
 
-\subsection{\DIFdelbegin \DIFdel{Introduction}\DIFdelend \DIFaddbegin \DIFadd{介绍}\DIFaddend }\label{uefiintro}
+\subsection{Introduction}\label{uefiintro}
 
 \href{https://uefi.org/specifications}{UEFI} (Unified Extensible Firmware Interface)
 is a specification that defines a software interface between an operating system and
