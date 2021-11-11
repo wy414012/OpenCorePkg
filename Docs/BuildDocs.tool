@@ -10,22 +10,22 @@ latexbuild() {
   rm -f ./*.aux ./*.log ./*.out ./*.pdf ./*.toc
 
   # Perform a first pass
-  pdflatex -draftmode "$1" "$2" || \
+  xelatex -draftmode "$1" "$2" || \
     abort "Unable to create $1 draft"
 
   # Perform a number of TOC passes.
   while grep 'Rerun to get ' "${1}.log" ; do
-    pdflatex -draftmode "$1" "$2" || \
+    xelatex -draftmode "$1" "$2" || \
       abort "Unable to create $1 draft with TOC"
   done
 
   # Create a real PDF.
-  pdflatex "$1" "$2" || \
+  xelatex "$1" "$2" || \
     abort "Unable to create $1 PDF"
 
   # Perform a number of TOC passes for PDF (usually not needed).
   while grep 'Rerun to get ' "${1}.log" ; do
-    pdflatex -draftmode "$1" "$2" || \
+    xelatex -draftmode "$1" "$2" || \
       abort "Unable to create $1 PDF with TOC"
   done
 }
@@ -40,11 +40,11 @@ if [ "$(which pdflatex)" = "" ]; then
   abort "pdflatex is missing, check your TeX Live installation"
 fi
 
-latexbuild Configuration
+latexbuild Configuration_zh
 
 cd Differences || abort "Unable to process annotations"
 rm -f ./*.aux ./*.log ./*.out ./*.pdf ./*.toc
-latexdiff --allow-spaces -s ONLYCHANGEDPAGE PreviousConfiguration.tex ../Configuration.tex ../Configuration_zh.tex \
+latexdiff --allow-spaces -s ONLYCHANGEDPAGE PreviousConfiguration.tex ../Configuration_zh.tex \
   > Differences.tex || \
   abort "Unable to differentiate"
 latexbuild Differences -interaction=nonstopmode

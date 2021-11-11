@@ -107,7 +107,7 @@ jobs:
       - name: 安装依赖
         run: |
           sudo apt-get update
-          sudo apt-get install nasm uuid-dev iasl doxygen texlive texlive-latex-extra
+          sudo apt-get install nasm uuid-dev iasl doxygen texlive texlive-latex-extra texlive-xetex latex-cjk-all
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
           sudo ./llvm.sh 13

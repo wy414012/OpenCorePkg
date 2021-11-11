@@ -6,6 +6,8 @@ OpenCore Changelog
 - 添加了自动缩放因子检测
 - 明确限制`ResizeAppleGpuBars`为 0 和 -1
 - 修复了 OpenCanopy 长标签在图形背景上淡出的问题
+- 修复了 `ProvideConsoleGop` 不禁用 blit-only 模式（例如在 Z690 上）
+- 修复了 Alder Lake SMBIOS CPU 型号信息
 #### v0.7.5
 - 修订了 OpenLinuxBoot 文档
 - 支持 Linux ostree 引导布局

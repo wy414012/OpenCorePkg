@@ -174,6 +174,7 @@ package() {
 
   docs=(
     "Configuration.pdf"
+	"Configuration_zh.pdf"
     "Differences/Differences.pdf"
     "Sample.plist"
     "SampleCustom.plist"
@@ -182,6 +183,7 @@ package() {
     cp "${selfdir}/Docs/${doc}" "${dstdir}/Docs"/ || exit 1
   done
   cp "${selfdir}/Changelog.md" "${dstdir}/Docs"/ || exit 1
+  cp "${selfdir}/Changelog_zh.md" "${dstdir}/Docs"/ || exit 1
   cp -r "${selfdir}/Docs/AcpiSamples/"* "${dstdir}/Docs/AcpiSamples"/ || exit 1
 
   mkdir -p "${dstdir}/Docs/AcpiSamples/Binaries" || exit 1
