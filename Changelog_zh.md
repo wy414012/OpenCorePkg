@@ -8,6 +8,8 @@ OpenCore Changelog
 - 修复了 OpenCanopy 长标签在图形背景上淡出的问题
 - 修复了 `ProvideConsoleGop` 不禁用 blit-only 模式（例如在 Z690 上）
 - 修复了 Alder Lake SMBIOS CPU 型号信息
+- 为 Intel Alder Lake 添加了 XCPM CPU 电源管理 ACPI 表
+- 更新了绘制顺序以避免 OpenCanopy 中的图形撕裂
 #### v0.7.5
 - 修订了 OpenLinuxBoot 文档
 - 支持 Linux ostree 引导布局
