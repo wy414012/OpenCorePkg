@@ -10,6 +10,10 @@ OpenCore Changelog
 - 修复了 Alder Lake SMBIOS CPU 型号信息
 - 为 Intel Alder Lake 添加了 XCPM CPU 电源管理 ACPI 表
 - 更新了绘制顺序以避免 OpenCanopy 中的图形撕裂
+- 修复了在 ScanPolicy 中使用逻辑单元处理 PCI 设备路径
+- 添加了用于启用替代 UEFI 图形驱动程序的“ReconnectGraphicsOnConnect”选项
+- 添加了 BiosVideo.efi 驱动程序以与`ReconnectGraphicsOnConnect`一起使用
+
 #### v0.7.5
 - 修订了 OpenLinuxBoot 文档
 - 支持 Linux ostree 引导布局
