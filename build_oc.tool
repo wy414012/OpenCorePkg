@@ -93,8 +93,7 @@ package() {
     "EFI/OC/Tools"
     "EFI/OC/Resources/Audio"
     "EFI/OC/Resources/Font"
-	"EFI/OC/Resources/Image/Auto"
-    "EFI/OC/Resources/Image/Default"
+    "EFI/OC/Resources/Image"
     "EFI/OC/Resources/Label"
     )
 
@@ -152,19 +151,19 @@ package() {
     cp "${arch}/Shell.efi" "${dstdir}/${arch}/EFI/OC/Tools/OpenShell.efi" || exit 1
 
     efiDrivers=(
-	  "AudioDxe.efi"
-	  "BiosVideo.efi"
+      "AudioDxe.efi"
+      "BiosVideo.efi"
       "CrScreenshotDxe.efi"
-	  "HiiDatabase.efi"
-	  "NvmExpressDxe.efi"
+      "HiiDatabase.efi"
+      "NvmExpressDxe.efi"
       "OpenCanopy.efi"
-	  "OpenHfsPlus.efi"
+      "OpenHfsPlus.efi"
       "OpenLinuxBoot.efi"
       "OpenPartitionDxe.efi"
       "OpenRuntime.efi"
       "OpenUsbKbDxe.efi"
       "Ps2KeyboardDxe.efi"
-	  "Ps2MouseDxe.efi"
+      "Ps2MouseDxe.efi"
       "UsbMouseDxe.efi"
       "XhciDxe.efi"
       )
@@ -175,7 +174,6 @@ package() {
 
   docs=(
     "Configuration.pdf"
-	"Configuration_zh.pdf"
     "Differences/Differences.pdf"
     "Sample.plist"
     "SampleCustom.plist"
@@ -184,7 +182,6 @@ package() {
     cp "${selfdir}/Docs/${doc}" "${dstdir}/Docs"/ || exit 1
   done
   cp "${selfdir}/Changelog.md" "${dstdir}/Docs"/ || exit 1
-  cp "${selfdir}/Changelog_zh.md" "${dstdir}/Docs"/ || exit 1
   cp -r "${selfdir}/Docs/AcpiSamples/"* "${dstdir}/Docs/AcpiSamples"/ || exit 1
 
   mkdir -p "${dstdir}/Docs/AcpiSamples/Binaries" || exit 1
@@ -281,7 +278,7 @@ NO_ARCHIVES=0
 export SELFPKG
 export NO_ARCHIVES
 
-src=$(curl -Lfs https://raw.githubusercontent.com/wy414012/ocbuild/Yaming/efibuild.sh) && eval "$src" || exit 1
+src=$(curl -Lfs https://raw.githubusercontent.com/acidanthera/ocbuild/master/efibuild.sh) && eval "$src" || exit 1
 
 cd Library/OcConfigurationLib || exit 1
 ./CheckSchema.py OcConfigurationLib.c || exit 1
