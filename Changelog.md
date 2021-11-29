@@ -12,6 +12,9 @@ OpenCore Changelog
 - Fixed handling PCI device paths with logical units in ScanPolicy
 - Added `ReconnectGraphicsOnConnect` option for enabling alternative UEFI graphics drivers
 - Added BiosVideo.efi driver to use with `ReconnectGraphicsOnConnect`
+- Changed `FadtEnableReset` to avoid unreliable keyboard controller reset
+- Added `EnableVmx` quirk to allow virtualization in other OS on some Macs
+- Upgraded `ProtectUefiServices` to prevent GRUB shim overwriting service pointers when chainloading with Secure Boot enabled
 
 #### v0.7.5
 - Revised OpenLinuxBoot documentation
@@ -708,4 +711,3 @@ OpenCore Changelog
 
 #### v0.0.1
 - Initial developer preview release
-
