@@ -816,13 +816,14 @@ OcLoadUefiSupport (
   IN UINT8               *Signature
   )
 {
+  EFI_STATUS            Status;
   EFI_HANDLE            *DriversToConnect;
   EFI_EVENT             Event;
   BOOLEAN               AvxEnabled;
 
   OcReinstallProtocols (Config);
 
-  OcImageLoaderInit ();
+  OcImageLoaderInit (Config->Booter.Quirks.ProtectUefiServices);
 
   OcLoadAppleSecureBoot (Config);
 
@@ -839,6 +840,11 @@ OcLoadUefiSupport (
 
   if (Config->Uefi.Quirks.IgnoreInvalidFlexRatio) {
     OcCpuCorrectFlexRatio (CpuInfo);
+  }
+
+  if (Config->Uefi.Quirks.EnableVmx) {
+    Status = OcCpuEnableVmx ();
+    DEBUG ((EFI_ERROR (Status) ? DEBUG_WARN : DEBUG_INFO, "OC: Enable VMX - %r\n", Status));
   }
 
   if (Config->Uefi.Quirks.TscSyncTimeout > 0) {
