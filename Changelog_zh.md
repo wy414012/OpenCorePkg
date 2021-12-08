@@ -1,5 +1,8 @@
 OpenCore Changelog
 ==================
+#### v0.7.7
+- 修复了入口点寄存器损坏导致的罕见崩溃
+
 #### v0.7.6
 - 添加构建环境，处理与主分支冲突
 - 使用 GCC 编译时修复了堆栈支持
@@ -13,6 +16,7 @@ OpenCore Changelog
 - 修复了在 ScanPolicy 中使用逻辑单元处理 PCI 设备路径
 - 添加了用于启用替代 UEFI 图形驱动程序的“ReconnectGraphicsOnConnect”选项
 - 添加了 BiosVideo.efi 驱动程序以与`ReconnectGraphicsOnConnect`一起使用
+- 固定处理零大小的内存属性表
 
 #### v0.7.5
 - 修订了 OpenLinuxBoot 文档
