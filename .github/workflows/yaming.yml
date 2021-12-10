@@ -132,3 +132,32 @@ jobs:
         with:
           name: OpenCore-Linux-clang38-build
           path: Binaries/*.zip
+  build-windows:
+    name: Build Windows VS2019
+    runs-on: windows-latest
+    env:
+      HAS_OPENSSL_BUILD: 0
+      CC: gcc
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: 安装依赖
+        run: |
+          choco install make nasm zip --no-progress
+          choco install iasl --no-progress --version=2017.11.10
+
+      - name: CI 引导
+        run: |
+          src=$(curl -Lfs https://raw.githubusercontent.com/wy414012/ocbuild/Yaming/ci-bootstrap.sh) && eval "$src" || exit 1
+
+      - run: ./build_duet.tool
+      - run: ./build_oc.tool
+
+      - name: 打包上传工件
+        uses: actions/upload-artifact@v2
+        with:
+          name: Windows-build-OpenCore
+          path: Binaries/*.zip
