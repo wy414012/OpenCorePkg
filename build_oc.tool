@@ -93,7 +93,7 @@ package() {
     "EFI/OC/Tools"
     "EFI/OC/Resources/Audio"
     "EFI/OC/Resources/Font"
-	"EFI/OC/Resources/Image/Auto"
+    "EFI/OC/Resources/Image/Auto"
     "EFI/OC/Resources/Image/Default"
     "EFI/OC/Resources/Label"
     )
