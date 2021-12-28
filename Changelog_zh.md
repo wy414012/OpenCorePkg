@@ -2,6 +2,16 @@ OpenCore Changelog
 ==================
 #### v0.7.7
 - 修复了入口点寄存器损坏导致的罕见崩溃
+- 添加了ProvideCurrentCpuInfo对 Intel Alder Lake 的支持
+- 修复Cpuid1Data了英特尔 Rocket Lake 和更新版本推荐中的错字
+- 更新了 SMBIOS 和其余部分的内置固件版本
+- 将底层 EDK II 包更新为 edk2-stable202111
+- 解决了 AudioDxe 中 QEMU 中两个可能的崩溃问题
+- 添加了 AudioDxe 设置缓存（避免不必要的设置延迟）
+- 添加了 DisconnectHda 怪癖以允许 Apple 硬件（和其他硬件）上的 UEFI 声音
+- 添加了自动检测的 Cirrus Logic GPIO 启用以允许 Apple 硬件上的 UEFI 声音
+- 为 QEMU intel-hda 驱动程序中的错误添加了解决方法，以允许 QEMU 中的 UEFI 声音
+- 实现多声道（例如低音+主扬声器；扬声器+耳机）UEFI 声音配置 AudioOutMask
 
 #### v0.7.6
 - 添加构建环境，处理与主分支冲突
