@@ -12,7 +12,7 @@ OpenCore Changelog
 - 添加了自动检测的 Cirrus Logic GPIO 启用以允许 Apple 硬件上的 UEFI 声音
 - 为 QEMU intel-hda 驱动程序中的错误添加了解决方法，以允许 QEMU 中的 UEFI 声音
 - 实现多声道（例如低音+主扬声器；扬声器+耳机）UEFI 声音配置 AudioOutMask
-
+- 修复了当 Nvidia HDA 音频存在时 AudioDxe 启动停止的问题
 #### v0.7.6
 - 添加构建环境，处理与主分支冲突
 - 使用 GCC 编译时修复了堆栈支持
