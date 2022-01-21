@@ -1,5 +1,11 @@
 OpenCore Changelog
 ==================
+#### v0.7.8
+- 更新了 ocvalidate 以使用安全的`SecureBootModel`警告不安全的` DmgLoading`（在运行时已被禁止）
+- 修复了 AudioDxe 在最近更新后不会禁用未使用的频道
+- 允许在没有“SystemAudioVolumeDB”的旧 macOS 上跟踪操作系统音量
+- 修正了验证密码时不支持鼠标的崩溃
+- 修复了在启用“ProvideCustomSlide”的情况下设置 AppleInternal CSR 位
 #### v0.7.7
 - 修复了入口点寄存器损坏导致的罕见崩溃
 - 添加了ProvideCurrentCpuInfo对 Intel Alder Lake 的支持
@@ -18,6 +24,9 @@ OpenCore Changelog
 - 在内置 AppleEvent 实现中添加了指针设备列表调整
 - 添加了音频 GPIO 和 VREF 处理以在更多 Apple 硬件上支持 UEFI 声音
 - 更新了音频输出通道检测以支持更多 Apple 硬件上的 UEFI 声音
+- 添加了手动 GPIO 配置（在 Apple 硬件上使用`--gpio-setup` AudioDxe 驱动程序参数获取 UEFI 声音）
+- 将 UEFI 音频级别切换为分贝增益，以准确匹配已保存的 macOS 音量级别
+- 最小音频辅助音量和最小可听音量的单独设置
 #### v0.7.6
 - 添加构建环境，处理与主分支冲突
 - 使用 GCC 编译时修复了堆栈支持
