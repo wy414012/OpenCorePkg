@@ -17,7 +17,7 @@ env:
 jobs:
   build-macos:
     name: 使用macOS Xcode构建
-    runs-on: macos-11
+    runs-on: macos-latest
     env:
       JOB_TYPE: BUILD
     steps:
@@ -60,7 +60,7 @@ jobs:
           tag: ${{ github.ref }}
           file_glob: true
   build-linux:
-    name: linux-clang构建
+    name: linux-CLANGPDB/GCC5
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -91,7 +91,7 @@ jobs:
 
   build-windows:
     name: 使用 Windows VS2019 构建
-    runs-on: windows-2019
+    runs-on: windows-latest
     env:
       HAS_OPENSSL_BUILD: 0
       CC: gcc
@@ -116,5 +116,5 @@ jobs:
       - name: 打包上传构建工件
         uses: actions/upload-artifact@v2
         with:
-          name: Windows build OpenCore
+          name: Windows_build_OpenCore
           path: Binaries/*.zip
