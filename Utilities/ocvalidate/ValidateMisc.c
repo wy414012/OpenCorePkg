@@ -196,6 +196,8 @@ CheckMiscBoot (
   BOOLEAN               HasOpenCanopyEfiDriver;
   CONST CHAR8           *PickerMode;
   CONST CHAR8           *PickerVariant;
+  UINTN                 PVSumSize;
+  UINTN                 PVPathFixedSize;
   BOOLEAN               IsPickerAudioAssistEnabled;
   BOOLEAN               IsAudioSupportEnabled;
   CONST CHAR8           *LauncherOption;
@@ -256,8 +258,15 @@ CheckMiscBoot (
   //
   // There is one missing '\\' after the concatenation of PickerVariant and ExtAppleRecv10_15.icns (which has the longest length). Append one.
   //
-  if (L_STR_LEN (OPEN_CORE_IMAGE_PATH) + AsciiStrLen (PickerVariant) + 1 + L_STR_SIZE ("ExtAppleRecv10_15.icns") > OC_STORAGE_SAFE_PATH_MAX) {
-    DEBUG ((DEBUG_WARN, "Misc->Boot->PickerVariant is too long (should not exceed %u)!\n", OC_STORAGE_SAFE_PATH_MAX));
+  PVPathFixedSize = L_STR_LEN (OPEN_CORE_IMAGE_PATH) + 1 + L_STR_SIZE ("ExtAppleRecv10_15.icns");
+  PVSumSize       = PVPathFixedSize + AsciiStrLen (PickerVariant);
+  if (PVSumSize > OC_STORAGE_SAFE_PATH_MAX) {
+    DEBUG ((
+      DEBUG_WARN,
+      "Misc->Boot->PickerVariant (length %u) is too long (should not exceed %u)!\n",
+      AsciiStrLen (PickerVariant),
+      OC_STORAGE_SAFE_PATH_MAX - PVPathFixedSize
+      ));
     ++ErrorCount;
   }
 
