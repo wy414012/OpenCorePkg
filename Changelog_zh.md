@@ -1,11 +1,32 @@
 OpenCore Changelog
 ==================
+#### v0.7.9
+- 添加了文件无法显示时使用的自动检测`macOS Installer`卷名`.disk_label`
+- 向 `AudioDxe`添加`--restore-nosnoop`了标志，使 v0.7.7 修复了 Windows 声音选择加入
+- 添加了新方法以在SetApfsTrimTimeout设置为零时禁用修剪
+- 已在 macOS 12 上修复`SetApfsTrimTimeout`（仅在设置为零时有效）
+- 添加了将 qemu 恢复映像构建到 macrecovery 的脚本
+- 修复SecureBootModel了管理程序上的选择（应该是x86legacy）
+- Strategy为预链接和更新添加了 kext 阻止
+- 在 KVM 中添加了全局 `MSR ProvideCurrentCpuInfo35h`修复`-cpu host`
+- 修复了启用 AVX 加速的潜在内存损坏
+- 添加LogModules了模块的正负日志过滤
+- 将OpenLinuxBoot 驱动程序参数从重命名`partuuidopts:{PARTUUID}`为`autoopts:{PARTUUID}`
+- 支持从没有文件的独立`/boot`分区引导 Linux /loader/entries（用户必须指定完整的内核引导选项）
+- 驱动程序参数中处理的 XML 实体
 #### v0.7.8
-- 更新了 ocvalidate 以使用安全的`SecureBootModel`警告不安全的` DmgLoading`（在运行时已被禁止）
+- 更新了 ocvalidate 以警告不安全`DmgLoading`的安全`SecureBootModel`（在运行时已经不允许）
 - 修复了 AudioDxe 在最近更新后不会禁用未使用的频道
-- 允许在没有“SystemAudioVolumeDB”的旧 macOS 上跟踪操作系统音量
-- 修正了验证密码时不支持鼠标的崩溃
-- 修复了在启用“ProvideCustomSlide”的情况下设置 AppleInternal CSR 位
+- 允许增益跟踪旧 macOS 上的操作系统音量，而无需`SystemAudioVolumeDB`
+- 修复了验证密码时不支持鼠标的崩溃
+- 固定 AppleInternal CSR 位被设置为`ProvideCustomSlide`启用
+- 添加了对引导入口协议条目的支持`.contentFlavour`和文件，包括 OpenLinuxBoot`.contentDetails`
+- 向 OpenLinuxBoot添加`LINUX_BOOT_ADD_RW`了标志以支持例如 EndeavourOS
+- 如果需要，向 OpenLinuxBoot添加`flags+=`和`flags-=`参数以简化设置驱动程序标志
+- `LINUX_BOOT_USE_LATEST`修复了清除标志时的 OpenLinuxBoot 条目名称歧义
+- 更新了 SMBIOS 和其余部分的内置固件版本
+- 修复了部分（重新）安装 Linux 发行版的 OpenLinuxBoot 崩溃
+- 改进了格式错误的 PE 图像文件解析的鲁棒性
 #### v0.7.7
 - 修复了入口点寄存器损坏导致的罕见崩溃
 - 添加了ProvideCurrentCpuInfo对 Intel Alder Lake 的支持
