@@ -16,8 +16,8 @@ jobs:
           echo "StrictHostKeyChecking no" >> ~/.ssh/config
       - name: Push Mirror
         env:
-          SOURCE_REPO: 'git@github.com:wy414012/OpenCorePkg.git'
-          DESTINATION_REPO: 'git@gitee.com:yaming-network/open-core-pkg.git'
+          SOURCE_REPO: 'https://github.com/acidanthera/OpenCorePkg.git'
+          DESTINATION_REPO: 'git@gitee.com:yaming-network/OpenCorePkg.git'
         run: |
           git clone --mirror "$SOURCE_REPO" && cd `basename "$SOURCE_REPO"`
           git remote set-url --push origin "$DESTINATION_REPO"
