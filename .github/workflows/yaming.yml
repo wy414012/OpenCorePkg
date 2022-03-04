@@ -16,7 +16,7 @@ env:
 
 jobs:
   build-macos:
-    name: 使用macOS Xcode构建
+    name: 使用 Xcode-latest
     runs-on: macos-latest
     env:
       JOB_TYPE: BUILD
@@ -90,8 +90,8 @@ jobs:
           path: Binaries/*.zip
 
   build-windows:
-    name: 使用 Windows VS2019 构建
-    runs-on: windows-2019
+    name: Windows VS2022
+    runs-on: windows-latest
     env:
       HAS_OPENSSL_BUILD: 0
       CC: gcc
