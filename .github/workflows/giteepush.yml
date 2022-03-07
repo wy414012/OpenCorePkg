@@ -1,4 +1,4 @@
-name: OpenCorePkg to Gitee Repo
+name: update gitee repo
 
 on: [ push, delete, create ]
 
@@ -16,7 +16,7 @@ jobs:
           echo "StrictHostKeyChecking no" >> ~/.ssh/config
       - name: Push Mirror
         env:
-          SOURCE_REPO: 'https://github.com/acidanthera/OpenCorePkg.git'
+          SOURCE_REPO: 'https://github.com/wy414012/OpenCorePkg.git'
           DESTINATION_REPO: 'git@gitee.com:yaming-network/OpenCorePkg.git'
         run: |
           git clone --mirror "$SOURCE_REPO" && cd `basename "$SOURCE_REPO"`
