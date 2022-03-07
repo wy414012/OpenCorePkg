@@ -154,13 +154,14 @@ OC_BN_WORD
 BigNumCalculateMontParams (
   IN OUT OC_BN_WORD        *RSqrMod,
   IN     OC_BN_NUM_WORDS   NumWords,
-  IN     CONST OC_BN_WORD  *N
+  IN     CONST OC_BN_WORD  *N,
+  IN     OC_BN_WORD        *Scratch
   )
 {
   OC_BN_WORD      N0Inv;
   UINT32          NumBits;
-  UINTN           SizeRSqr;
   OC_BN_NUM_WORDS NumWordsRSqr;
+  OC_BN_NUM_WORDS NumWordsMod;
   OC_BN_WORD      *RSqr;
 
   ASSERT (RSqrMod != NULL);
@@ -177,7 +178,7 @@ BigNumCalculateMontParams (
     return 0;
   }
 
-  NumBits = BigNumSignificantBits (N, NumWords);
+  NumBits = NumWords * OC_BN_WORD_SIZE * OC_CHAR_BIT;
 
   STATIC_ASSERT (
     OC_BN_MAX_SIZE * OC_CHAR_BIT <= ((MAX_UINTN - 1) / 2) - (OC_CHAR_BIT - 1),
@@ -185,22 +186,13 @@ BigNumCalculateMontParams (
     );
   //
   // Considering NumBits can at most be MAX_UINT16 * OC_CHAR_BIT, this cannot
-  // overflow. OC_CHAR_BIT-1 is added to achieve rounding towards the next Byte
-  // boundary.
+  // overflow.
   //
-  SizeRSqr = ALIGN_VALUE (
-               ((2 * (NumBits + 1) + (OC_CHAR_BIT - 1)) / OC_CHAR_BIT),
-               OC_BN_WORD_SIZE
-               );
-  if (SizeRSqr > OC_BN_MAX_SIZE) {
-    return 0;
-  }
+  NumWordsRSqr = (OC_BN_NUM_WORDS)(1 + 2 * NumWords);
+  NumWordsMod  = 2 * NumWordsRSqr;
 
-  RSqr = AllocatePool (SizeRSqr);
-  if (RSqr == NULL) {
-    return 0;
-  }
-  NumWordsRSqr = (OC_BN_NUM_WORDS)(SizeRSqr / OC_BN_WORD_SIZE);
+  RSqr = Scratch + NumWordsMod;
+
   //
   // Calculate Montgomery's R^2 mod N.
   //
@@ -209,9 +201,8 @@ BigNumCalculateMontParams (
   // 2 * NumBits cannot overflow as per above.
   //
   BigNumOrWord (RSqr, NumWordsRSqr, 1, 2 * NumBits);
-  BigNumMod (RSqrMod, NumWords, RSqr, NumWordsRSqr, N);
 
-  FreePool (RSqr);
+  BigNumMod (RSqrMod, NumWords, RSqr, NumWordsRSqr, N, Scratch);
 
   return N0Inv;
 }
@@ -566,11 +557,10 @@ BigNumPowMod (
   IN     UINT32            B,
   IN     CONST OC_BN_WORD  *N,
   IN     OC_BN_WORD        N0Inv,
-  IN     CONST OC_BN_WORD  *RSqrMod
+  IN     CONST OC_BN_WORD  *RSqrMod,
+  IN     OC_BN_WORD        *ATmp
   )
 {
-  OC_BN_WORD *ATmp;
-
   UINTN      Index;
 
   ASSERT (Result != NULL);
@@ -587,11 +577,6 @@ BigNumPowMod (
     return FALSE;
   }
 
-  ATmp = AllocatePool ((UINTN)NumWords * OC_BN_WORD_SIZE);
-  if (ATmp == NULL) {
-    DEBUG ((DEBUG_INFO, "OCCR: Memory allocation failure in ModPow\n"));
-    return FALSE;
-  }
   //
   // Convert A into the Montgomery Domain.
   // ATmp = MM (A, R^2 mod N)
@@ -646,6 +631,5 @@ BigNumPowMod (
     BigNumSub (Result, NumWords, Result, N);
   }
 
-  FreePool (ATmp);
   return TRUE;
 }
