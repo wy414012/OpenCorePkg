@@ -627,7 +627,7 @@ PatchUsbXhciPortLimit1 (
   // On 10.14.4 and newer IOUSBHostFamily also needs limit removal.
   // Thanks to ydeng discovering this.
   //
-  if (!OcMatchDarwinVersion (KernelVersion, KERNEL_VERSION(18, 5, 0), 0)) {
+  if (!OcMatchDarwinVersion (KernelVersion, KERNEL_VERSION (18, 5, 0), 0)) {
     DEBUG ((DEBUG_INFO, "OCAK: Skipping port patch IOUSBHostFamily on %u\n", KernelVersion));
     return EFI_SUCCESS;
   }
@@ -1890,6 +1890,135 @@ PatchLegacyCommpage (
 }
 
 STATIC
+CONST UINT8
+mAquantiaEthernetPatchFindV1[] = {
+  0x41, 0xC7, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  ///< mov dword ptr [whatever], 0
+  0xE9                                             ///< jmp
+};
+
+STATIC
+CONST UINT8
+mAquantiaEthernetPatchReplaceV1[] = {
+  0x41, 0xC7, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,  ///< mov dword ptr [whatever], 1
+  0xE9                                             ///< jmp
+};
+
+STATIC
+CONST UINT8
+mAquantiaEthernetPatchMaskV1[] = {
+  0xFF, 0xFF, 0x00, 0x00, 0xFF, 0x00, 0x00, 0x00,
+  0xFF
+};
+
+STATIC
+PATCHER_GENERIC_PATCH
+mAquantiaEthernetPatchV1 = {
+  .Comment = DEBUG_POINTER ("ForceAquantiaEthernetV1"),
+  .Base    = "__ZN30AppleEthernetAquantiaAqtion10718checkConfigSupportERiS0_",
+  .Find    = mAquantiaEthernetPatchFindV1,
+  .Mask    = mAquantiaEthernetPatchMaskV1,
+  .Replace = mAquantiaEthernetPatchReplaceV1,
+  .ReplaceMask = mAquantiaEthernetPatchMaskV1,
+  .Size    = sizeof (mAquantiaEthernetPatchFindV1),
+  .Count   = 1,
+  .Skip    = 0
+};
+
+STATIC
+CONST UINT8
+mAquantiaEthernetPatchFindV2[] = {
+  0x83, 0x7D, 0x00, 0x00,              ///< cmp dword [rbp+whatever], whatever
+  0x0F, 0x84, 0x00, 0x00, 0x00, 0x00,  ///< je unsupported
+  0x83, 0x7D                           ///< LBL:
+};
+
+
+STATIC
+CONST UINT8
+mAquantiaEthernetPatchFindMaskV2[] = {
+  0xFF, 0xFF, 0x00, 0x00,
+  0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00,
+  0xFF, 0xFF
+};
+
+STATIC
+CONST UINT8
+mAquantiaEthernetPatchReplaceV2[] = {
+  0x83, 0x7D, 0x00, 0x00,              ///< cmp dword [rbp+whatever], whatever
+  0xEB, 0x04, 0x90, 0x90, 0x90, 0x90,  ///< jmp LBL
+  0x83, 0x7D                           ///< LBL:
+};
+
+STATIC
+CONST UINT8
+mAquantiaEthernetPatchReplaceMaskV2[] = {
+  0xFF, 0xFF, 0x00, 0x00,
+  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+  0xFF, 0xFF
+};
+
+STATIC
+PATCHER_GENERIC_PATCH
+mAquantiaEthernetPatchV2 = {
+  .Comment = DEBUG_POINTER ("ForceAquantiaEthernetV2"),
+  .Base    = "__ZN27AppleEthernetAquantiaAqtion5startEP9IOService",
+  .Find    = mAquantiaEthernetPatchFindV2,
+  .Mask    = mAquantiaEthernetPatchFindMaskV2,
+  .Replace = mAquantiaEthernetPatchReplaceV2,
+  .ReplaceMask = mAquantiaEthernetPatchReplaceMaskV2,
+  .Size    = sizeof (mAquantiaEthernetPatchFindV2),
+  .Count   = 1,
+  .Skip    = 0
+};
+
+STATIC
+EFI_STATUS
+PatchAquantiaEthernet (
+  IN OUT PATCHER_CONTEXT    *Patcher,
+  IN     UINT32             KernelVersion
+  )
+{
+  EFI_STATUS   Status;
+
+  //
+  // FIXME: Check whether any patches are required before 10.15.4.
+  //
+  
+  //
+  // This patch is not required before macOS 10.15.4.
+  //
+  if (!OcMatchDarwinVersion (KernelVersion, KERNEL_VERSION (19, 4, 0), 0)) {
+    DEBUG ((DEBUG_INFO, "OCAK: Skipping patching AquantiaEthernet before %u\n", KernelVersion));
+    return EFI_SUCCESS;
+  }
+
+  if (Patcher == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  //
+  // In most cases either patch will work fine.
+  // However, patch V2 by Shikumo is preferred.
+  // Thanks to Mieze and Shikumo for the patches.
+  //
+  Status = PatcherApplyGenericPatch (Patcher, &mAquantiaEthernetPatchV2);
+  if (!EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "OCAK: Patch success Aquantia Ethernet v2\n"));
+    return Status;
+  }
+
+  DEBUG ((DEBUG_INFO, "OCAK: Failed to apply Aquantia Ethernet patch v2 - %r, trying v1\n", Status));
+  Status = PatcherApplyGenericPatch (Patcher, &mAquantiaEthernetPatchV1);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "OCAK: Failed to apply Aquantia Ethernet patch v1 - %r\n", Status));
+  } else {
+    DEBUG ((DEBUG_INFO, "OCAK: Patch success Aquantia Ethernet v1\n"));
+  }
+
+  return Status;
+}
+
+STATIC
 EFI_STATUS
 PatchForceSecureBootScheme (
   IN OUT PATCHER_CONTEXT    *Patcher,
@@ -2085,6 +2214,7 @@ KERNEL_QUIRK gKernelQuirks[] = {
   [KernelQuirkLegacyCommpage] = { NULL, PatchLegacyCommpage },
   [KernelQuirkForceSecureBootScheme] = { "com.apple.security.AppleImage4", PatchForceSecureBootScheme },
   [KernelQuirkSetApfsTrimTimeout] = { "com.apple.filesystems.apfs", PatchSetApfsTrimTimeout },
+  [KernelQuirkForceAquantiaEthernet] = { "com.apple.driver.AppleEthernetAquantiaAqtion", PatchAquantiaEthernet },
 };
 
 EFI_STATUS

@@ -44,7 +44,7 @@
   captionpos=b,
   basicstyle=\ttfamily\normalsize,
   keepspaces=true,
-  morekeywords={git, make, build, ioreg, grep, nvram, sort, sudo, diskutil, gfxutil, strings, dd, cut, python},
+  morekeywords={git, make, build, ioreg, grep, nvram, sort, sudo, diskutil, gfxutil, strings, dd, cut, python3},
   literate =
     {"}{{\textquotedbl}}1
     {'}{{\textquotesingle}}1
@@ -2648,6 +2648,19 @@ blocking.
   typically have compatible AHCI controllers.
 
 \item
+  \texttt{ForceAquantiaEthernet}\\
+  \textbf{Type}: \texttt{plist\ boolean}\\
+  \textbf{Failsafe}: \texttt{false}\\
+  \textbf{Requirement}: 10.15.4\\
+  \textbf{Description}: Enable Aquantia AQtion AQC-107s based 10GbE network cards support.
+
+  This option enables Aquantia AQtion AQC-107s based 10GbE network cards support,
+  which used to work natively before macOS 10.15.4.
+
+  \emph{Note}: When this option is enabled, \texttt{DisableIoMapper} must be disabled and
+  \texttt{VT-d} must be enabled in BIOS. Otherwise, network cards will not function correctly.
+
+\item
   \texttt{ForceSecureBootScheme}\\
   \textbf{Type}: \texttt{plist\ boolean}\\
   \textbf{Failsafe}: \texttt{false}\\
@@ -3662,7 +3675,7 @@ the default boot entry choice will remain changed until the next manual reconfig
 
 \begin{lstlisting}[label=kpanic, style=ocbash]
 cat Kernel.panic | grep macOSProcessedStackshotData |
-  python -c 'import json,sys;print(json.load(sys.stdin)["macOSPanicString"])'
+  python3 -c 'import json,sys;print(json.load(sys.stdin)["macOSPanicString"])'
 \end{lstlisting}
 
 \item

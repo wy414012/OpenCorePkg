@@ -1,7 +1,7 @@
 \documentclass[]{article}
 %DIF LATEXDIFF DIFFERENCE FILE
 %DIF DEL PreviousConfiguration.tex   Thu Mar 10 21:36:27 2022
-%DIF ADD ../Configuration.tex        Thu Mar 17 14:39:28 2022
+%DIF ADD ../Configuration.tex        Sun Mar 20 17:31:15 2022
 
 \usepackage{lmodern}
 \usepackage{amssymb,amsmath}
@@ -47,7 +47,11 @@
   captionpos=b,
   basicstyle=\ttfamily\normalsize,
   keepspaces=true,
-  morekeywords={git, make, build, ioreg, grep, nvram, sort, sudo, diskutil, gfxutil, strings, dd, cut, python},
+%DIF 47c47
+%DIF <   morekeywords={git, make, build, ioreg, grep, nvram, sort, sudo, diskutil, gfxutil, strings, dd, cut, python},
+%DIF -------
+  morekeywords={git, make, build, ioreg, grep, nvram, sort, sudo, diskutil, gfxutil, strings, dd, cut, python3}, %DIF > 
+%DIF -------
   literate =
     {"}{{\textquotedbl}}1
     {'}{{\textquotesingle}}1
@@ -2708,7 +2712,23 @@ blocking.
   typically have compatible AHCI controllers.
 
 \item
-  \texttt{ForceSecureBootScheme}\\
+  \DIFaddbegin \texttt{\DIFadd{ForceAquantiaEthernet}}\\
+  \textbf{\DIFadd{Type}}\DIFadd{: }\texttt{\DIFadd{plist\ boolean}}\\
+  \textbf{\DIFadd{Failsafe}}\DIFadd{: }\texttt{\DIFadd{false}}\\
+  \textbf{\DIFadd{Requirement}}\DIFadd{: 10.15.4}\\
+  \textbf{\DIFadd{Description}}\DIFadd{: Enable Aquantia AQtion AQC-107s based 10GbE network cards support.
+}
+
+  \DIFadd{This option enables Aquantia AQtion AQC-107s based 10GbE network cards support,
+  which used to work natively before macOS 10.15.4.
+}
+
+  \emph{\DIFadd{Note}}\DIFadd{: When this option is enabled, }\texttt{\DIFadd{DisableIoMapper}} \DIFadd{must be disabled and
+  }\texttt{\DIFadd{VT-d}} \DIFadd{must be enabled in BIOS. Otherwise, network cards will not function correctly.
+}
+
+\item
+  \DIFaddend \texttt{ForceSecureBootScheme}\\
   \textbf{Type}: \texttt{plist\ boolean}\\
   \textbf{Failsafe}: \texttt{false}\\
   \textbf{Requirement}: 11\\
@@ -3723,10 +3743,13 @@ the default boot entry choice will remain changed until the next manual reconfig
   Starting with macOS Catalina, kernel panics are stored in JSON format and thus
   need to be preprocessed before passing to \texttt{kpdescribe.sh}:
 
-\begin{lstlisting}[label=kpanic, style=ocbash]
+\DIFmodbegin
+\begin{lstlisting}[label=kpanic, style=ocbash,alsolanguage=DIFcode]
 cat Kernel.panic | grep macOSProcessedStackshotData |
-  python -c 'import json,sys;print(json.load(sys.stdin)["macOSPanicString"])'
+%DIF <   python -c 'import json,sys;print(json.load(sys.stdin)["macOSPanicString"])'
+%DIF >   python3 -c 'import json,sys;print(json.load(sys.stdin)["macOSPanicString"])'
 \end{lstlisting}
+\DIFmodend
 
 \item
   \texttt{DisableWatchDog}\\

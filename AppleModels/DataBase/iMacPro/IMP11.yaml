@@ -1,6 +1,10 @@
 BIOSVendor: "Apple Inc."
 BIOSVersion: "1731.100.130.0.0"
+<<<<<<< HEAD
 BIOSLegacyVersion: "IMP11.88Z.F000.B00.2202152211"
+=======
+BIOSLegacyVersion: "IMP11.88Z.F000.B00.2202152135"
+>>>>>>> fb28ce2cae94dd674e7bf8c0fb73522856158c12
 BIOSReleaseDate: "02/15/2022"
 SystemManufacturer: "Apple Inc."
 SystemProductName: "iMacPro1,1"
@@ -48,11 +52,19 @@ SmcPlatform:
   - 0x00
 OEMStrings: |-
   Apple ROM Version
+<<<<<<< HEAD
     BIOS ID:      IMP11.88Z.F000.B00.2202152211
     Model:        IMP11
     EFI Version:  1731.100.130.0.0
     Built by:     root@bb-g9-pdb105
     Date:         Tue Feb 15 22:11:33 2022
+=======
+    BIOS ID:      IMP11.88Z.F000.B00.2202152135
+    Model:        IMP11
+    EFI Version:  1731.100.130.0.0
+    Built by:     root@5pqg4
+    Date:         Tue Feb 15 21:35:34 2022
+>>>>>>> fb28ce2cae94dd674e7bf8c0fb73522856158c12
     Revision:     1731.100.130 (B&I)
     ROM Version:  F000_B00
     Build Type:   Official Build, RELEASE

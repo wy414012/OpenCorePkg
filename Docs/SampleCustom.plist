@@ -1013,6 +1013,8 @@
 			<false/>
 			<key>ExternalDiskIcons</key>
 			<false/>
+			<key>ForceAquantiaEthernet</key>
+			<false/>
 			<key>ForceSecureBootScheme</key>
 			<false/>
 			<key>IncreasePciBarSize</key>
@@ -1617,11 +1619,11 @@
 		<key>SMBIOS</key>
 		<dict>
 			<key>BIOSReleaseDate</key>
-			<string>12/16/2021</string>
+			<string>01/20/2022</string>
 			<key>BIOSVendor</key>
 			<string>Acidanthera</string>
 			<key>BIOSVersion</key>
-			<string>1715.80.5.0.0</string>
+			<string>1731.100.125.0.0</string>
 			<key>BoardAssetTag</key>
 			<string></string>
 			<key>BoardLocationInChassis</key>
