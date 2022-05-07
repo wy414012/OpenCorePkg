@@ -46,7 +46,7 @@ CheckConfig (
   // Pass config structure to all checkers.
   //
   for (Index = 0; Index < ARRAY_SIZE (ConfigCheckers); ++Index) {
-    CurrErrorCount = ConfigCheckers[Index] (Config);
+    CurrErrorCount = ConfigCheckers[Index](Config);
 
     if (CurrErrorCount != 0) {
       //
@@ -60,29 +60,35 @@ CheckConfig (
   return ErrorCount;
 }
 
-int ENTRY_POINT(int argc, const char *argv[]) {
-  UINT8              *ConfigFileBuffer;
-  UINT32             ConfigFileSize;
-  CONST CHAR8        *ConfigFileName;
-  INT64              ExecTimeStart;
-  OC_GLOBAL_CONFIG   Config;
-  EFI_STATUS         Status;
-  UINT32             ErrorCount;
+int
+ENTRY_POINT (
+  int   argc,
+  char  *argv[]
+  )
+{
+  UINT8             *ConfigFileBuffer;
+  UINT32            ConfigFileSize;
+  CONST CHAR8       *ConfigFileName;
+  INT64             ExecTimeStart;
+  OC_GLOBAL_CONFIG  Config;
+  EFI_STATUS        Status;
+  UINT32            ErrorCount;
 
   ErrorCount = 0;
 
   //
   // Enable PCD debug logging.
   //
-  PcdGet8  (PcdDebugPropertyMask)         |= DEBUG_PROPERTY_DEBUG_CODE_ENABLED;
+  PcdGet8 (PcdDebugPropertyMask)          |= DEBUG_PROPERTY_DEBUG_CODE_ENABLED;
   PcdGet32 (PcdFixedDebugPrintErrorLevel) |= DEBUG_INFO;
   PcdGet32 (PcdDebugPrintErrorLevel)      |= DEBUG_INFO;
+
+  DEBUG ((DEBUG_ERROR, "\nNOTE: This version of ocvalidate is only compatible with OpenCore version %a!\n\n", OPEN_CORE_VERSION));
 
   //
   // Print usage.
   //
-  if (argc != 2 || (argc > 1 && AsciiStrCmp (argv[1], "--version") == 0)) {
-    DEBUG ((DEBUG_ERROR, "\nNOTE: This version of ocvalidate is only compatible with OpenCore version %a!\n\n", OPEN_CORE_VERSION));
+  if (argc != 2) {
     DEBUG ((DEBUG_ERROR, "Usage: %a <path/to/config.plist>\n\n", argv[0]));
     return -1;
   }
@@ -110,6 +116,7 @@ int ENTRY_POINT(int argc, const char *argv[]) {
     DEBUG ((DEBUG_ERROR, "Invalid config\n"));
     return -1;
   }
+
   if (ErrorCount > 0) {
     DEBUG ((DEBUG_ERROR, "Serialisation returns %u %a!\n", ErrorCount, ErrorCount > 1 ? "errors" : "error"));
   }
@@ -146,7 +153,12 @@ int ENTRY_POINT(int argc, const char *argv[]) {
   return 0;
 }
 
-INT32 LLVMFuzzerTestOneInput(CONST UINT8 *Data, UINTN Size) {
+int
+LLVMFuzzerTestOneInput (
+  const uint8_t  *Data,
+  size_t         Size
+  )
+{
   VOID              *NewData;
   OC_GLOBAL_CONFIG  Config;
 

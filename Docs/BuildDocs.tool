@@ -54,7 +54,9 @@ builddocs() {
   latexbuild Errata
 
   cd .. || abort "Unable to cd back to Docs directory"
+}
 
+updatedocshash() {
   err=0
   if [ "$(which md5)" != "" ]; then
     HASH=$(md5 Configuration.tex | cut -f4 -d' ')
@@ -76,6 +78,9 @@ builddocs() {
   fi
 
   echo "$HASH" > "Configuration.md5"
+}
+
+checkdocs() {
   if [ "$HASH" != "$OLDHASH" ]; then
     echo "Configuration hash ${HASH} is different from ${OLDHASH}."
     echo "You forgot to rebuild documentation (Configuration.pdf)!"
@@ -138,6 +143,13 @@ main() {
   fi
 
   builddocs
+  updatedocshash
+
+  case "$1" in
+    -c|--check-docs )
+      checkdocs
+    ;;
+  esac
 }
 
 main "$@"

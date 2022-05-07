@@ -29,8 +29,7 @@ typedef struct APPLE_VOICE_OVER_AUDIO_PROTOCOL_ APPLE_VOICE_OVER_AUDIO_PROTOCOL;
 /**
   Apple VoiceOver Audio protocol revision.
 **/
-#define APPLE_VOICE_OVER_AUDIO_PROTOCOL_REVISION 0x10000
-
+#define APPLE_VOICE_OVER_AUDIO_PROTOCOL_REVISION  0x10000
 
 /**
   These files can be found either on BridgeOS volume:
@@ -42,6 +41,7 @@ typedef struct APPLE_VOICE_OVER_AUDIO_PROTOCOL_ APPLE_VOICE_OVER_AUDIO_PROTOCOL;
   Files marked with * are only present on BridgeOS.
 **/
 typedef enum {
+  AppleVoiceOverAudioFileIndexLocalisedMin           = 0x01, ///< First valid localised file
   AppleVoiceOverAudioFileVoiceOverOn                 = 0x01, ///< VoiceOverOn
   AppleVoiceOverAudioFileVoiceOverOff                = 0x02, ///< VoiceOverOff
   AppleVoiceOverAudioFileUsername                    = 0x03, ///< Username
@@ -49,12 +49,28 @@ typedef enum {
   AppleVoiceOverAudioFileUsernameOrPasswordIncorrect = 0x05, ///< UsernameOrPasswordIncorrect
   AppleVoiceOverAudioFileAccountLockedTryLater       = 0x06, ///< AccountLockedTryLater (*)
   AppleVoiceOverAudioFileAccountLocked               = 0x07, ///< AccountLocked (*)
+  AppleVoiceOverAudioFileIndexLocalisedMax           = 0x08, ///< After last valid localised file
+  AppleVoiceOverAudioFileIndexNonLocalisedMin        = 0x3B, ///< First valid non-localised file
   AppleVoiceOverAudioFileVoiceOverBoot               = 0x3B, ///< VoiceOver_Boot (*)
   AppleVoiceOverAudioFileVoiceOverBoot2              = 0x3C, ///< VoiceOver_Boot (*)
   AppleVoiceOverAudioFileClick                       = 0x3D, ///< Click (*)
   AppleVoiceOverAudioFileBeep                        = 0x3E, ///< Beep
-  AppleVoiceOverAudioFileMax                         = 0x3F,
+  AppleVoiceOverAudioFileIndexNonLocalisedMax        = 0x3F, ///< After last valid non-localised file
 } APPLE_VOICE_OVER_AUDIO_FILE;
+
+/**
+  Corresponding file base names.
+**/
+#define APPLE_VOICE_OVER_AUDIO_FILE_VOICE_OVER_ON                   "VoiceOverOn"
+#define APPLE_VOICE_OVER_AUDIO_FILE_VOICE_OVER_OFF                  "VoiceOverOff"
+#define APPLE_VOICE_OVER_AUDIO_FILE_USERNAME                        "Username"
+#define APPLE_VOICE_OVER_AUDIO_FILE_PASSWORD                        "Password"
+#define APPLE_VOICE_OVER_AUDIO_FILE_USERNAME_OR_PASSWORD_INCORRECT  "UsernameOrPasswordIncorrect"
+#define APPLE_VOICE_OVER_AUDIO_FILE_ACCOUNT_LOCKED_TRY_LATER        "AccountLockedTryLater"
+#define APPLE_VOICE_OVER_AUDIO_FILE_ACCOUNT_LOCKED                  "AccountLocked"
+#define APPLE_VOICE_OVER_AUDIO_FILE_VOICE_OVER_BOOT                 "VoiceOver_Boot"
+#define APPLE_VOICE_OVER_AUDIO_FILE_CLICK                           "Click"
+#define APPLE_VOICE_OVER_AUDIO_FILE_BEEP                            "Beep"
 
 /**
   VoiceOver language codes.
@@ -110,7 +126,7 @@ typedef enum {
 **/
 typedef
 EFI_STATUS
-(EFIAPI *APPLE_VOICE_OVER_AUDIO_PLAY) (
+(EFIAPI *APPLE_VOICE_OVER_AUDIO_PLAY)(
   IN     APPLE_VOICE_OVER_AUDIO_PROTOCOL  *This,
   IN     UINT8                            File
   );
@@ -126,7 +142,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *APPLE_VOICE_OVER_AUDIO_SET_LANGUAGE_CODE) (
+(EFIAPI *APPLE_VOICE_OVER_AUDIO_SET_LANGUAGE_CODE)(
   IN     APPLE_VOICE_OVER_AUDIO_PROTOCOL  *This,
   IN     UINT8                            LanguageCode
   );
@@ -142,7 +158,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *APPLE_VOICE_OVER_AUDIO_SET_LANGUAGE_STRING) (
+(EFIAPI *APPLE_VOICE_OVER_AUDIO_SET_LANGUAGE_STRING)(
   IN     APPLE_VOICE_OVER_AUDIO_PROTOCOL  *This,
   IN     CONST CHAR8                      *LanguageString
   );
@@ -159,7 +175,7 @@ EFI_STATUS
 **/
 typedef
 EFI_STATUS
-(EFIAPI *APPLE_VOICE_OVER_AUDIO_GET_LANGUAGE) (
+(EFIAPI *APPLE_VOICE_OVER_AUDIO_GET_LANGUAGE)(
   IN     APPLE_VOICE_OVER_AUDIO_PROTOCOL  *This,
   OUT    UINT8                            *LanguageCode,
   OUT    CONST CHAR8                      **LanguageString
@@ -169,13 +185,13 @@ EFI_STATUS
   VoiceOver protocol.
 **/
 struct APPLE_VOICE_OVER_AUDIO_PROTOCOL_ {
-  UINTN Revision;
-  APPLE_VOICE_OVER_AUDIO_PLAY                 Play;
-  APPLE_VOICE_OVER_AUDIO_SET_LANGUAGE_CODE    SetLanguageCode;
-  APPLE_VOICE_OVER_AUDIO_SET_LANGUAGE_STRING  SetLanguageString;
-  APPLE_VOICE_OVER_AUDIO_GET_LANGUAGE         GetLanguage;
+  UINTN                                         Revision;
+  APPLE_VOICE_OVER_AUDIO_PLAY                   Play;
+  APPLE_VOICE_OVER_AUDIO_SET_LANGUAGE_CODE      SetLanguageCode;
+  APPLE_VOICE_OVER_AUDIO_SET_LANGUAGE_STRING    SetLanguageString;
+  APPLE_VOICE_OVER_AUDIO_GET_LANGUAGE           GetLanguage;
 };
 
-extern EFI_GUID gAppleVOAudioProtocolGuid;
+extern EFI_GUID  gAppleVOAudioProtocolGuid;
 
 #endif // APPLE_VO_AUDIO_H

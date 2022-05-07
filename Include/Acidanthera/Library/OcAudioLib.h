@@ -12,7 +12,7 @@
 #include <Library/OcFileLib.h>
 #include <Protocol/OcAudio.h>
 
-#define OC_AUDIO_DEFAULT_GAIN     (-30)
+#define OC_AUDIO_DEFAULT_GAIN  (-30)
 
 /**
   Install audio support protocols.
@@ -53,10 +53,10 @@ OcLanguageCodeToString (
 **/
 VOID
 OcGetAmplifierGain (
-  OUT UINT8              *RawGain,
-  OUT INT8               *DecibelGain,
-  OUT BOOLEAN            *Muted,
-  OUT BOOLEAN            *TryConversion
+  OUT UINT8    *RawGain,
+  OUT INT8     *DecibelGain,
+  OUT BOOLEAN  *Muted,
+  OUT BOOLEAN  *TryConversion
   );
 
 /**
@@ -68,7 +68,7 @@ OcGetAmplifierGain (
 **/
 EFI_STATUS
 OcSetVoiceOverLanguage (
-  CONST CHAR8   *Language  OPTIONAL
+  CONST CHAR8  *Language  OPTIONAL
   );
 
 /**
@@ -82,5 +82,13 @@ EFI_STATUS
 OcAudioDump (
   IN EFI_FILE_PROTOCOL  *Root
   );
+
+//
+// Base path and base type for a given APPLE_VOICE_OVER_AUDIO_FILE index.
+//
+typedef struct {
+  CONST CHAR8    *BasePath;
+  CONST CHAR8    *BaseType;
+} APPLE_VOICE_OVER_FILE_MAP;
 
 #endif // OC_AUDIO_LIB_H

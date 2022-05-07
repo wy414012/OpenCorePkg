@@ -23,18 +23,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Default to 128-bit key length for AES.
 //
 #ifndef CONFIG_AES_KEY_SIZE
-#define CONFIG_AES_KEY_SIZE 16
+#define CONFIG_AES_KEY_SIZE  16
 #endif
 
 //
 // Set supported hashes to all by default.
 //
 #ifndef CONFIG_HAS_SUPPORTED_HASHES
-#define OC_CRYPTO_SUPPORTS_SHA256 1
-#define OC_CRYPTO_SUPPORTS_SHA384 1
-#define OC_CRYPTO_SUPPORTS_SHA512 1
-#define OC_CRYPTO_SUPPORTS_SHA1   1
-#define OC_CRYPTO_SUPPORTS_MD5    1
+#define OC_CRYPTO_SUPPORTS_SHA256  1
+#define OC_CRYPTO_SUPPORTS_SHA384  1
+#define OC_CRYPTO_SUPPORTS_SHA512  1
+#define OC_CRYPTO_SUPPORTS_SHA1    1
+#define OC_CRYPTO_SUPPORTS_MD5     1
 #endif
 
 //
@@ -58,25 +58,25 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Derived parameters.
 //
-#define AES_BLOCK_SIZE 16
+#define AES_BLOCK_SIZE  16
 
 //
 // Support all AES key sizes.
 //
 #if CONFIG_AES_KEY_SIZE == 32
-#define AES_KEY_EXP_SIZE 240
+#define AES_KEY_EXP_SIZE  240
 #elif CONFIG_AES_KEY_SIZE == 24
-#define AES_KEY_EXP_SIZE 208
+#define AES_KEY_EXP_SIZE  208
 #elif CONFIG_AES_KEY_SIZE == 16
-#define AES_KEY_EXP_SIZE 176
+#define AES_KEY_EXP_SIZE  176
 #else
-#error "Only AES-128, AES-192, and AES-256 are supported!"
+  #error "Only AES-128, AES-192, and AES-256 are supported!"
 #endif
 
 //
 // ChaCha key size.
 //
-#define CHACHA_KEY_SIZE 32
+#define CHACHA_KEY_SIZE  32
 
 //
 // ChaCha IV size.
@@ -106,78 +106,84 @@ typedef enum OC_SIG_HASH_TYPE_ {
 } OC_SIG_HASH_TYPE;
 
 typedef struct AES_CONTEXT_ {
-  UINT8 RoundKey[AES_KEY_EXP_SIZE];
-  UINT8 Iv[AES_BLOCK_SIZE];
+  UINT8    RoundKey[AES_KEY_EXP_SIZE];
+  UINT8    Iv[AES_BLOCK_SIZE];
 } AES_CONTEXT;
 
 typedef struct CHACHA_CONTEXT_ {
-  UINT32 Input[16];
+  UINT32    Input[16];
 } CHACHA_CONTEXT;
 
 typedef struct MD5_CONTEXT_ {
-  UINT8   Data[64];
-  UINT32  DataLen;
-  UINT64  BitLen;
-  UINT32  State[4];
+  UINT8     Data[64];
+  UINT32    DataLen;
+  UINT64    BitLen;
+  UINT32    State[4];
 } MD5_CONTEXT;
 
 typedef struct SHA1_CONTEXT_ {
-  UINT8   Data[64];
-  UINT32  DataLen;
-  UINT64  BitLen;
-  UINT32  State[5];
-  UINT32  K[4];
+  UINT8     Data[64];
+  UINT32    DataLen;
+  UINT64    BitLen;
+  UINT32    State[5];
+  UINT32    K[4];
 } SHA1_CONTEXT;
 
 typedef struct SHA256_CONTEXT_ {
-  UINT8   Data[64];
-  UINT32  DataLen;
-  UINT64  BitLen;
-  UINT32  State[8];
+  UINT8     Data[64];
+  UINT32    DataLen;
+  UINT64    BitLen;
+  UINT32    State[8];
 } SHA256_CONTEXT;
 
 typedef struct SHA512_CONTEXT_ {
-  UINT64 TotalLength;
-  UINTN  Length;
-  UINT8  Block[2 * SHA512_BLOCK_SIZE];
-  UINT64 State[8];
+  UINT64    TotalLength;
+  UINTN     Length;
+  UINT8     Block[2 * SHA512_BLOCK_SIZE];
+  UINT64    State[8];
 } SHA512_CONTEXT;
 
 typedef SHA512_CONTEXT SHA384_CONTEXT;
-
-#pragma pack(push, 1)
 
 ///
 /// The structure describing the RSA Public Key format.
 /// The exponent is always 65537.
 ///
-typedef PACKED struct {
+typedef struct {
   ///
   /// The number of 64-bit values of N and RSqrMod each.
   ///
-  UINT16 NumQwords;
+  UINT16    NumQwords;
   ///
   /// Padding for 64-bit alignment. Must be 0 to allow future extensions.
   ///
-  UINT8  Reserved[6];
+  UINT8     Reserved[6];
   ///
   /// The Montgomery Inverse in 64-bit space: -1 / N[0] mod 2^64.
   ///
-  UINT64 N0Inv;
+  UINT64    N0Inv;
 } OC_RSA_PUBLIC_KEY_HDR;
 
-typedef PACKED struct {
+STATIC_ASSERT (
+  sizeof (OC_RSA_PUBLIC_KEY_HDR) == 16,
+  "The PK header struct is malformed."
+  );
+
+typedef struct {
   ///
   /// The RSA Public Key header structure.
   ///
-  OC_RSA_PUBLIC_KEY_HDR Hdr;
+  OC_RSA_PUBLIC_KEY_HDR    Hdr;
   ///
   /// The Modulus and Montgomery's R^2 mod N in little endian byte order.
   ///
-  UINT64                Data[];
+  UINT64                   Data[];
 } OC_RSA_PUBLIC_KEY;
 
-#pragma pack(pop)
+STATIC_ASSERT (
+  sizeof (OC_RSA_PUBLIC_KEY_HDR) == sizeof (OC_RSA_PUBLIC_KEY_HDR),
+  "The PK struct is malformed."
+  );
 
 //
 // Functions prototypes
@@ -259,7 +265,7 @@ VOID
 ChaChaCryptBuffer (
   IN OUT CHACHA_CONTEXT  *Context,
   IN     CONST UINT8     *Source,
-     OUT UINT8           *Destination,
+  OUT UINT8              *Destination,
   IN     UINT32          Length
   );
 
@@ -416,11 +422,19 @@ SigVerifyShaHashBySize (
   IN UINTN        HashSize
   );
 
+#define RSA_MOD_MAX_SIZE  BASE_16KB
+
 /**
-  @param[in] ModulusSize    Modulus size in bytes.
+  @param[in] ModulusSize  Modulus size in bytes. Must be at most
+                          RSA_MOD_MAX_SIZE.
 **/
 #define RSA_SCRATCH_BUFFER_SIZE(ModulusSize) \
-  ((ModulusSize) * 3)
+  ((ModulusSize) * 3U)
+
+STATIC_ASSERT (
+  RSA_MOD_MAX_SIZE <= MAX_UINTN / 3U,
+  "The definition of RSA_SCRATCH_BUFFER_SIZE may cause an overflow"
+  );
 
 /**
   Verify a RSA PKCS1.5 signature against an expected hash.
@@ -447,6 +461,34 @@ RsaVerifySigHashFromKey (
   IN OC_SIG_HASH_TYPE         Algorithm,
   IN VOID                     *Scratch
   );
+
+#ifndef OC_CRYPTO_NDYNALLOC
+
+/**
+  Verify a RSA PKCS1.5 signature against an expected hash.
+  The exponent is always 65537 as per the format specification.
+
+  @param[in] Key            The RSA Public Key.
+  @param[in] Signature      The RSA signature to be verified.
+  @param[in] SignatureSize  Size, in bytes, of Signature.
+  @param[in] Hash           The Hash digest of the signed data.
+  @param[in] HashSize       Size, in bytes, of Hash.
+  @param[in] Algorithm      The RSA algorithm used.
+
+  @returns  Whether the signature has been successfully verified as valid.
+
+**/
+BOOLEAN
+RsaVerifySigHashFromKeyDynalloc (
+  IN CONST OC_RSA_PUBLIC_KEY  *Key,
+  IN CONST UINT8              *Signature,
+  IN UINTN                    SignatureSize,
+  IN CONST UINT8              *Hash,
+  IN UINTN                    HashSize,
+  IN OC_SIG_HASH_TYPE         Algorithm
+  );
+
+#endif // OC_CRYPTO_NDYNALLOC
 
 /**
   Verify RSA PKCS1.5 signed data against its signature.
@@ -475,6 +517,36 @@ RsaVerifySigDataFromKey (
   IN OC_SIG_HASH_TYPE         Algorithm,
   IN VOID                     *Scratch
   );
+
+#ifndef OC_CRYPTO_NDYNALLOC
+
+/**
+  Verify RSA PKCS1.5 signed data against its signature.
+  The modulus' size must be a multiple of the configured BIGNUM word size.
+  This will be true for any conventional RSA, which use two's potencies.
+  The exponent is always 65537 as per the format specification.
+
+  @param[in] Key            The RSA Public Key.
+  @param[in] Signature      The RSA signature to be verified.
+  @param[in] SignatureSize  Size, in bytes, of Signature.
+  @param[in] Data           The signed data to verify.
+  @param[in] DataSize       Size, in bytes, of Data.
+  @param[in] Algorithm      The RSA algorithm used.
+
+  @returns  Whether the signature has been successfully verified as valid.
+
+**/
+BOOLEAN
+RsaVerifySigDataFromKeyDynalloc (
+  IN CONST OC_RSA_PUBLIC_KEY  *Key,
+  IN CONST UINT8              *Signature,
+  IN UINTN                    SignatureSize,
+  IN CONST UINT8              *Data,
+  IN UINTN                    DataSize,
+  IN OC_SIG_HASH_TYPE         Algorithm
+  );
+
+#endif // OC_CRYPTO_NDYNALLOC
 
 /**
   Verify RSA PKCS1.5 signed data against its signature.

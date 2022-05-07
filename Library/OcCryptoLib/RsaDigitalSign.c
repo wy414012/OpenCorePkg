@@ -26,21 +26,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 
 #ifdef OC_CRYPTO_SUPPORTS_SHA256
-STATIC CONST UINT8 mPkcsDigestEncodingPrefixSha256[] = {
+STATIC CONST UINT8  mPkcsDigestEncodingPrefixSha256[] = {
   0x30, 0x31, 0x30, 0x0d, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04,
   0x02, 0x01, 0x05, 0x00, 0x04, 0x20
 };
 #endif
 
 #ifdef OC_CRYPTO_SUPPORTS_SHA384
-STATIC CONST UINT8 mPkcsDigestEncodingPrefixSha384[] = {
+STATIC CONST UINT8  mPkcsDigestEncodingPrefixSha384[] = {
   0x30, 0x41, 0x30, 0x0d, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04,
   0x02, 0x02, 0x05, 0x00, 0x04, 0x30
 };
 #endif
 
 #ifdef OC_CRYPTO_SUPPORTS_SHA512
-STATIC CONST UINT8 mPkcsDigestEncodingPrefixSha512[] = {
+STATIC CONST UINT8  mPkcsDigestEncodingPrefixSha512[] = {
   0x30, 0x51, 0x30, 0x0d, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04,
   0x02, 0x03, 0x05, 0x00, 0x04, 0x40
 };
@@ -55,7 +55,7 @@ STATIC CONST UINT8 mPkcsDigestEncodingPrefixSha512[] = {
 STATIC
 BOOLEAN
 InternalRsaModulusSizeIsAllowed (
-  IN UINTN  ModulusSize
+  IN OC_BN_SIZE  ModulusSize
   )
 {
   //
@@ -91,8 +91,8 @@ SigVerifyShaHashBySize (
   IN UINTN        HashSize
   )
 {
-  OC_SIG_HASH_TYPE Hashtype;
-  UINT8            DataDigest[OC_MAX_SHA_DIGEST_SIZE];
+  OC_SIG_HASH_TYPE  Hashtype;
+  UINT8             DataDigest[OC_MAX_SHA_DIGEST_SIZE];
 
   ASSERT (Data != NULL);
   ASSERT (DataSize > 0);
@@ -101,32 +101,32 @@ SigVerifyShaHashBySize (
   ASSERT (HashSize <= sizeof (DataDigest));
 
   switch (HashSize) {
-#ifdef OC_CRYPTO_SUPPORTS_SHA512
+ #ifdef OC_CRYPTO_SUPPORTS_SHA512
     case SHA512_DIGEST_SIZE:
     {
       Hashtype = OcSigHashTypeSha512;
       Sha512 (DataDigest, Data, DataSize);
       break;
     }
-#endif
+ #endif
 
-#ifdef OC_CRYPTO_SUPPORTS_SHA384
+ #ifdef OC_CRYPTO_SUPPORTS_SHA384
     case SHA384_DIGEST_SIZE:
     {
       Hashtype = OcSigHashTypeSha384;
       Sha384 (DataDigest, Data, DataSize);
       break;
     }
-#endif
+ #endif
 
-#ifdef OC_CRYPTO_SUPPORTS_SHA256
+ #ifdef OC_CRYPTO_SUPPORTS_SHA256
     case SHA256_DIGEST_SIZE:
     {
       Hashtype = OcSigHashTypeSha256;
       Sha256 (DataDigest, Data, DataSize);
       break;
     }
-#endif
+ #endif
 
     default:
     {
@@ -163,7 +163,7 @@ STATIC
 BOOLEAN
 RsaVerifySigHashFromProcessed (
   IN CONST OC_BN_WORD  *N,
-  IN UINTN             NumWords,
+  IN OC_BN_NUM_WORDS   NumWords,
   IN OC_BN_WORD        N0Inv,
   IN CONST OC_BN_WORD  *RSqrMod,
   IN UINT32            Exponent,
@@ -175,19 +175,19 @@ RsaVerifySigHashFromProcessed (
   IN OC_BN_WORD        *Scratch
   )
 {
-  BOOLEAN     Result;
-  INTN        CmpResult;
+  BOOLEAN  Result;
+  INTN     CmpResult;
 
-  UINTN       ModulusSize;
+  OC_BN_SIZE  ModulusSize;
 
   OC_BN_WORD  *EncryptedSigNum;
   OC_BN_WORD  *DecryptedSigNum;
   OC_BN_WORD  *PowScratchNum;
 
-  CONST UINT8 *Padding;
-  UINTN       PaddingSize;
-  UINTN       DigestSize;
-  UINTN       Index;
+  CONST UINT8  *Padding;
+  UINTN        PaddingSize;
+  UINTN        DigestSize;
+  UINTN        Index;
 
   OC_BN_WORD  Tmp;
 
@@ -213,8 +213,7 @@ RsaVerifySigHashFromProcessed (
   }
 
   switch (Algorithm) {
-
-#ifdef OC_CRYPTO_SUPPORTS_SHA256
+ #ifdef OC_CRYPTO_SUPPORTS_SHA256
     case OcSigHashTypeSha256:
     {
       ASSERT (HashSize == SHA256_DIGEST_SIZE);
@@ -223,9 +222,9 @@ RsaVerifySigHashFromProcessed (
       PaddingSize = sizeof (mPkcsDigestEncodingPrefixSha256);
       break;
     }
-#endif
+ #endif
 
-#ifdef OC_CRYPTO_SUPPORTS_SHA384
+ #ifdef OC_CRYPTO_SUPPORTS_SHA384
     case OcSigHashTypeSha384:
     {
       ASSERT (HashSize == SHA384_DIGEST_SIZE);
@@ -234,9 +233,9 @@ RsaVerifySigHashFromProcessed (
       PaddingSize = sizeof (mPkcsDigestEncodingPrefixSha384);
       break;
     }
-#endif
+ #endif
 
-#ifdef OC_CRYPTO_SUPPORTS_SHA512
+ #ifdef OC_CRYPTO_SUPPORTS_SHA512
     case OcSigHashTypeSha512:
     {
       ASSERT (HashSize == SHA512_DIGEST_SIZE);
@@ -245,7 +244,7 @@ RsaVerifySigHashFromProcessed (
       PaddingSize = sizeof (mPkcsDigestEncodingPrefixSha512);
       break;
     }
-#endif
+ #endif
 
     default:
     {
@@ -254,11 +253,12 @@ RsaVerifySigHashFromProcessed (
       PaddingSize = 0;
     }
   }
+
   //
   // Verify the Signature size matches the Modulus size.
   // This implicitly verifies it's a multiple of the Word size.
   //
-  ModulusSize = NumWords * OC_BN_WORD_SIZE;
+  ModulusSize = OC_BN_SIZE (NumWords);
   if (!InternalRsaModulusSizeIsAllowed (ModulusSize)) {
     return FALSE;
   }
@@ -274,14 +274,14 @@ RsaVerifySigHashFromProcessed (
 
   BigNumParseBuffer (
     EncryptedSigNum,
-    (OC_BN_NUM_WORDS)NumWords,
+    NumWords,
     Signature,
     SignatureSize
     );
 
   Result = BigNumPowMod (
              DecryptedSigNum,
-             (OC_BN_NUM_WORDS)NumWords,
+             NumWords,
              EncryptedSigNum,
              Exponent,
              N,
@@ -292,6 +292,7 @@ RsaVerifySigHashFromProcessed (
   if (!Result) {
     return FALSE;
   }
+
   //
   // Convert the result to a big-endian byte array.
   // Re-use EncryptedSigNum as it is not required anymore.
@@ -309,6 +310,7 @@ RsaVerifySigHashFromProcessed (
             );
     EncryptedSigNum[Index] = Tmp;
   }
+
   Signature = (UINT8 *)EncryptedSigNum;
 
   //
@@ -332,9 +334,10 @@ RsaVerifySigHashFromProcessed (
     return FALSE;
   }
 
-  if (Signature[0] != 0x00 || Signature[1] != 0x01) {
+  if ((Signature[0] != 0x00) || (Signature[1] != 0x01)) {
     return FALSE;
   }
+
   //
   // 4. Generate an octet string PS consisting of emLen - tLen - 3 octets with
   //    hexadecimal value 0xff.  The length of PS will be at least 8 octets.
@@ -364,6 +367,7 @@ RsaVerifySigHashFromProcessed (
   if (CmpResult != 0) {
     return FALSE;
   }
+
   //
   // The code above must have covered the entire Signature range.
   //
@@ -408,8 +412,8 @@ RsaVerifySigDataFromProcessed (
   IN OC_BN_WORD        *Scratch
   )
 {
-  UINT8 Hash[OC_MAX_SHA_DIGEST_SIZE];
-  UINTN HashSize;
+  UINT8  Hash[OC_MAX_SHA_DIGEST_SIZE];
+  UINTN  HashSize;
 
   ASSERT (N != NULL);
   ASSERT (NumWords > 0);
@@ -426,33 +430,32 @@ RsaVerifySigDataFromProcessed (
     );
 
   switch (Algorithm) {
-
-#ifdef OC_CRYPTO_SUPPORTS_SHA256
+ #ifdef OC_CRYPTO_SUPPORTS_SHA256
     case OcSigHashTypeSha256:
     {
       Sha256 (Hash, Data, DataSize);
       HashSize = SHA256_DIGEST_SIZE;
       break;
     }
-#endif
+ #endif
 
-#ifdef OC_CRYPTO_SUPPORTS_SHA384
+ #ifdef OC_CRYPTO_SUPPORTS_SHA384
     case OcSigHashTypeSha384:
     {
       Sha384 (Hash, Data, DataSize);
       HashSize = SHA384_DIGEST_SIZE;
       break;
     }
-#endif
+ #endif
 
-#ifdef OC_CRYPTO_SUPPORTS_SHA512
+ #ifdef OC_CRYPTO_SUPPORTS_SHA512
     case OcSigHashTypeSha512:
     {
       Sha512 (Hash, Data, DataSize);
       HashSize = SHA512_DIGEST_SIZE;
       break;
     }
-#endif
+ #endif
 
     default:
     {
@@ -493,17 +496,16 @@ RsaVerifySigDataFromData (
   IN OC_SIG_HASH_TYPE  Algorithm
   )
 {
-  UINTN           ModulusNumWordsTmp;
-  OC_BN_NUM_WORDS ModulusNumWords;
+  OC_BN_NUM_WORDS  ModulusNumWords;
 
-  VOID            *Memory;
-  VOID            *Mont;
-  OC_BN_WORD      *N;
-  OC_BN_WORD      *RSqrMod;
-  VOID            *Scratch;
+  OC_BN_WORD  *Memory;
+  VOID        *Mont;
+  OC_BN_WORD  *N;
+  OC_BN_WORD  *RSqrMod;
+  VOID        *Scratch;
 
-  OC_BN_WORD      N0Inv;
-  BOOLEAN         Result;
+  OC_BN_WORD  N0Inv;
+  BOOLEAN     Result;
 
   ASSERT (Modulus != NULL);
   ASSERT (ModulusSize > 0);
@@ -513,13 +515,20 @@ RsaVerifySigDataFromData (
   ASSERT (Data != NULL);
   ASSERT (DataSize > 0);
 
-  ModulusNumWordsTmp = ModulusSize / OC_BN_WORD_SIZE;
-  if (ModulusNumWordsTmp > OC_BN_MAX_LEN
-   || (ModulusSize % OC_BN_WORD_SIZE) != 0) {
+  if (  (ModulusSize > OC_BN_MONT_MAX_SIZE)
+     || ((ModulusSize % OC_BN_WORD_SIZE) != 0))
+  {
     return FALSE;
   }
 
-  ModulusNumWords = (OC_BN_NUM_WORDS)ModulusNumWordsTmp;
+  STATIC_ASSERT (
+    RSA_MOD_MAX_SIZE <= OC_BN_MONT_MAX_SIZE,
+    "The usage of BIG_NUM_MONT_PARAMS_SCRATCH_SIZE may be unsafe"
+    );
+  //
+  // By definition: ModulusNumWords <= OC_BN_MONT_MAX_SIZE <= OC_BN_MAX_SIZE.
+  //
+  ModulusNumWords = (OC_BN_NUM_WORDS)(ModulusSize / OC_BN_WORD_SIZE);
 
   STATIC_ASSERT (
     OC_BN_MAX_SIZE <= MAX_UINTN / 2,
@@ -527,15 +536,15 @@ RsaVerifySigDataFromData (
     );
 
   Memory = AllocatePool (
-    2 * ModulusSize + BIG_NUM_MONT_PARAMS_SCRATCH_SIZE (ModulusNumWords)
-    );
+             2 * ModulusSize + BIG_NUM_MONT_PARAMS_SCRATCH_SIZE (ModulusNumWords)
+             );
   if (Memory == NULL) {
     return FALSE;
   }
 
-  N       = (OC_BN_WORD *)Memory;
-  RSqrMod = (OC_BN_WORD *)((UINTN)N + ModulusSize);
-  Mont    = (UINT8 *)Memory + 2 * ModulusSize;
+  N       = &Memory[0 * ModulusNumWords];
+  RSqrMod = &Memory[1 * ModulusNumWords];
+  Mont    = &Memory[2 * ModulusNumWords];
 
   BigNumParseBuffer (N, ModulusNumWords, Modulus, ModulusSize);
 
@@ -545,6 +554,10 @@ RsaVerifySigDataFromData (
     return FALSE;
   }
 
+  //
+  // This usage of RSA_SCRATCH_BUFFER_SIZE may overflow. However, the caller
+  // will error in this case before accessing the buffer.
+  //
   Scratch = AllocatePool (RSA_SCRATCH_BUFFER_SIZE (ModulusSize));
   if (Scratch == NULL) {
     FreePool (Memory);
@@ -599,7 +612,7 @@ RsaVerifySigHashFromKey (
   //
   return RsaVerifySigHashFromProcessed (
            (OC_BN_WORD *)Key->Data,
-           Key->Hdr.NumQwords * (8 / OC_BN_WORD_SIZE),
+           (OC_BN_NUM_WORDS)Key->Hdr.NumQwords * (8 / OC_BN_WORD_SIZE),
            (OC_BN_WORD)Key->Hdr.N0Inv,
            (OC_BN_WORD *)&Key->Data[Key->Hdr.NumQwords],
            0x10001,
@@ -611,6 +624,50 @@ RsaVerifySigHashFromKey (
            Scratch
            );
 }
+
+#ifndef OC_CRYPTO_NDYNALLOC
+
+BOOLEAN
+RsaVerifySigHashFromKeyDynalloc (
+  IN CONST OC_RSA_PUBLIC_KEY  *Key,
+  IN CONST UINT8              *Signature,
+  IN UINTN                    SignatureSize,
+  IN CONST UINT8              *Hash,
+  IN UINTN                    HashSize,
+  IN OC_SIG_HASH_TYPE         Algorithm
+  )
+{
+  BOOLEAN  Result;
+  VOID     *Scratch;
+
+  ASSERT (Key != NULL);
+  //
+  // This usage of RSA_SCRATCH_BUFFER_SIZE may overflow. However, the caller
+  // will error in this case before accessing the buffer.
+  //
+  Scratch = AllocatePool (
+              RSA_SCRATCH_BUFFER_SIZE ((OC_BN_SIZE)Key->Hdr.NumQwords * sizeof (UINT64))
+              );
+  if (Scratch == NULL) {
+    return FALSE;
+  }
+
+  Result = RsaVerifySigHashFromKey (
+             Key,
+             Signature,
+             SignatureSize,
+             Hash,
+             HashSize,
+             Algorithm,
+             Scratch
+             );
+
+  FreePool (Scratch);
+
+  return Result;
+}
+
+#endif // OC_CRYPTO_NDYNALLOC
 
 BOOLEAN
 RsaVerifySigDataFromKey (
@@ -639,7 +696,7 @@ RsaVerifySigDataFromKey (
   //
   return RsaVerifySigDataFromProcessed (
            (OC_BN_WORD *)Key->Data,
-           Key->Hdr.NumQwords * (8 / OC_BN_WORD_SIZE),
+           (OC_BN_NUM_WORDS)Key->Hdr.NumQwords * (8 / OC_BN_WORD_SIZE),
            (OC_BN_WORD)Key->Hdr.N0Inv,
            (OC_BN_WORD *)&Key->Data[Key->Hdr.NumQwords],
            0x10001,
@@ -651,3 +708,47 @@ RsaVerifySigDataFromKey (
            Scratch
            );
 }
+
+#ifndef OC_CRYPTO_NDYNALLOC
+
+BOOLEAN
+RsaVerifySigDataFromKeyDynalloc (
+  IN CONST OC_RSA_PUBLIC_KEY  *Key,
+  IN CONST UINT8              *Signature,
+  IN UINTN                    SignatureSize,
+  IN CONST UINT8              *Data,
+  IN UINTN                    DataSize,
+  IN OC_SIG_HASH_TYPE         Algorithm
+  )
+{
+  BOOLEAN  Result;
+  VOID     *Scratch;
+
+  ASSERT (Key != NULL);
+  //
+  // This usage of RSA_SCRATCH_BUFFER_SIZE may overflow. However, the caller
+  // will error in this case before accessing the buffer.
+  //
+  Scratch = AllocatePool (
+              RSA_SCRATCH_BUFFER_SIZE ((OC_BN_SIZE)Key->Hdr.NumQwords * sizeof (UINT64))
+              );
+  if (Scratch == NULL) {
+    return FALSE;
+  }
+
+  Result = RsaVerifySigDataFromKey (
+             Key,
+             Signature,
+             SignatureSize,
+             Data,
+             DataSize,
+             Algorithm,
+             Scratch
+             );
+
+  FreePool (Scratch);
+
+  return Result;
+}
+
+#endif // OC_CRYPTO_NDYNALLOC

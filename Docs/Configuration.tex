@@ -94,7 +94,7 @@
 
        \vspace{0.2in}
 
-       Reference Manual (0.8.0)
+       Reference Manual (0.8.1)
 
        \vspace{0.2in}
 
@@ -395,7 +395,7 @@ Root configuration entries consist of the following:
 
 Basic validation of an \texttt{OC\ config} file is possible using
 the \texttt{ocvalidate} utility. Please note that the version of \texttt{ocvalidate}
-used must match the OpenCore release and that nothwithstanding this, it may not
+used must match the OpenCore release and that notwithstanding this, it may not
 detect all configuration issues present in an \texttt{OC\ config} file.
 
 \emph{Note}: To maintain system integrity, properties typically have predefined values even
@@ -2682,14 +2682,25 @@ blocking.
   \textbf{Type}: \texttt{plist\ boolean}\\
   \textbf{Failsafe}: \texttt{false}\\
   \textbf{Requirement}: 10.15.4\\
-  \textbf{Description}: Enable Aquantia AQtion AQC-107s based 10GbE network cards support.
+  \textbf{Description}: Enable Aquantia AQtion based 10GbE network cards support.
 
-  This option enables Aquantia AQtion AQC-107s based 10GbE network cards support,
+  This option enables Aquantia AQtion based 10GbE network cards support,
   which used to work natively before macOS 10.15.4.
 
   \emph{Note}: In order for Aquantia cards to properly function,
   \texttt{DisableIoMapper} must be disabled, \texttt{DMAR} ACPI table must not be dropped,
   and \texttt{VT-d} must be enabled in BIOS.
+
+  \emph{Note 2}: While this patch should enable ethernet support for all Aquantia AQtion series,
+  it has only been tested on AQC-107s based 10GbE network cards.
+
+  \emph{Note 3}: To address \texttt{AppleVTD} incompatibilities after applying this quirk,
+  the \texttt{Reserved Memory Region} section of the corresponding device in the \texttt{DMAR}
+  ACPI table might be removed. This table should be disassembled and edited, then recompiled to
+  \texttt{AML} with tool \texttt{iASL}. For the patched \texttt{DMAR} table to be \hyperref[acpipropsadd]{added},
+  the original one should be \hyperref[acpipropsdelete]{deleted}.
+  More details can be found at
+  \href{https://github.com/acidanthera/OpenCorePkg/commit/24414555f2c07e06a3674ec7a2aa1ce4860bbcc7#commitcomment-70530145}{comment on commit 2441455}.
 
 \item
   \texttt{ForceSecureBootScheme}\\
@@ -4509,6 +4520,15 @@ rm vault.pub
   \textbf{Description}: Set the clock rate for serial port.
 
   This option will override the value of \texttt{gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate}
+  defined in \href{https://github.com/acidanthera/audk/blob/master/MdeModulePkg/MdeModulePkg.dec}{MdeModulePkg.dec}.
+
+\item
+  \texttt{DetectCable}\\
+  \textbf{Type}: \texttt{plist\ boolean}\\
+  \textbf{Failsafe}: \texttt{false}\\
+  \textbf{Description}: Enable serial port cable detection.
+
+  This option will override the value of \texttt{gEfiMdeModulePkgTokenSpaceGuid.PcdSerialDetectCable}
   defined in \href{https://github.com/acidanthera/audk/blob/master/MdeModulePkg/MdeModulePkg.dec}{MdeModulePkg.dec}.
 
 \item
@@ -8007,7 +8027,9 @@ on most Apple hardware, and possibly some others) may be specified in \texttt{UE
   Apple audio protocols allow OpenCore and the macOS bootloader to play
   sounds and signals for screen reading or audible error reporting.
   Supported protocols are beep generation and VoiceOver. The VoiceOver protocol
-  is specific to Gibraltar machines (T2) and is not supported before
+  is only provided natively by Gibraltar machines (T2), however versions of macOS
+  which support VoiceOver will see and use the implementation provided by OpenCore,
+  on screens such as FileVault 2 unlock. VoiceOver is not supported before
   macOS High Sierra (10.13). Older macOS versions use the AppleHDA protocol
   (which is not currently implemented) instead.
 
