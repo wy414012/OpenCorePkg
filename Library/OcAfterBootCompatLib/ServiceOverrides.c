@@ -25,7 +25,6 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DevicePathLib.h>
-#include <Library/OcAppleSecureBootLib.h>
 #include <Library/OcBootManagementLib.h>
 #include <Library/OcLogAggregatorLib.h>
 #include <Library/OcDebugLogLib.h>
@@ -39,7 +38,6 @@
 #include <Library/UefiLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 
-#include <Protocol/AppleSecureBoot.h>
 #include <Protocol/OcFirmwareRuntime.h>
 #include <Protocol/VMwareMac.h>
 
@@ -779,6 +777,13 @@ InternalIsEfiBootRt (
      || (SourceBuffer == NULL)
      || (EfiBootLoadedImage->FilePath == NULL))
   {
+    DEBUG ((
+      DEBUG_INFO,
+      "OCABC: Cannot be EfiBootRt (DP %d, Buf %d, EfiBoot FP %d)\n",
+      (EfiBootRtDevicePath == NULL),
+      (SourceBuffer == NULL),
+      (EfiBootLoadedImage->FilePath == NULL)
+      ));
     return FALSE;
   }
 
@@ -789,8 +794,19 @@ InternalIsEfiBootRt (
   //
   EfiBootDevicePath = DevicePathFromHandle (EfiBootLoadedImage->DeviceHandle);
   if (EfiBootDevicePath == NULL) {
+    DEBUG ((
+      DEBUG_INFO,
+      "OCABC: Failed to get EfiBoot DP from handle 0x%llx\n",
+      (UINT64)(UINTN)EfiBootLoadedImage->DeviceHandle
+      ));
     return FALSE;
   }
+
+  DebugPrintDevicePath (
+    DEBUG_INFO,
+    "OCABC: Current EfiBoot",
+    EfiBootDevicePath
+    );
 
   EfiBootRtDevicePathRemSize = GetDevicePathSize (EfiBootRtDevicePath);
 
@@ -803,6 +819,12 @@ InternalIsEfiBootRt (
                &EfiBootRtDevicePathRemSize
                );
   if (Overflow) {
+    DEBUG ((
+      DEBUG_INFO,
+      "OCABC: EfiBootRt DP (0x%llx) is shorter than EfiBoot DP (0x%llx)\n",
+      (UINT64)EfiBootRtDevicePathRemSize,
+      (UINT64)ComponentSize
+      ));
     return FALSE;
   }
 
@@ -816,6 +838,7 @@ InternalIsEfiBootRt (
                 ComponentSize
                 );
   if (CmpResult != 0) {
+    DEBUG ((DEBUG_INFO, "OCABC: EfiBoot DP is not a prefix of EfiBootRt DP\n"));
     return FALSE;
   }
 
@@ -825,6 +848,12 @@ InternalIsEfiBootRt (
   ComponentSize = (UINTN)DevicePathEnd - (UINTN)EfiBootLoadedImage->FilePath;
 
   if (ComponentSize >= EfiBootRtDevicePathRemSize) {
+    DEBUG ((
+      DEBUG_INFO,
+      "OCABC: EfiBootRt FP (0x%llx) is shorter than EfiBoot FP (0x%llx)\n",
+      (UINT64)EfiBootRtDevicePathRemSize,
+      (UINT64)ComponentSize
+      ));
     return FALSE;
   }
 
@@ -834,6 +863,7 @@ InternalIsEfiBootRt (
                 ComponentSize
                 );
   if (CmpResult != 0) {
+    DEBUG ((DEBUG_INFO, "OCABC: EfiBoot FP is not a prefix of EfiBootRt FP\n"));
     return FALSE;
   }
 
@@ -845,6 +875,10 @@ InternalIsEfiBootRt (
   if (  (DevicePathType (CurrentRtNode) != HARDWARE_DEVICE_PATH)
      || (DevicePathSubType (CurrentRtNode) != HW_MEMMAP_DP))
   {
+    DEBUG ((
+      DEBUG_INFO,
+      "OCABC: EfiBootRt FP is not succeeded by a MemMap node\n"
+      ));
     return FALSE;
   }
 
@@ -853,6 +887,14 @@ InternalIsEfiBootRt (
   if (  (MemMapNode->StartingAddress != (EFI_PHYSICAL_ADDRESS)(UINTN)SourceBuffer)
      || (MemMapNode->EndingAddress != (EFI_PHYSICAL_ADDRESS)((UINTN)SourceBuffer + SourceSize)))
   {
+    DEBUG ((
+      DEBUG_INFO,
+      "OCABC: MemMap [0x%llx, 0x%llx) mismatches EfiBootRt [0x%llx, 0x%llx)\n",
+      MemMapNode->StartingAddress,
+      MemMapNode->EndingAddress,
+      (EFI_PHYSICAL_ADDRESS)(UINTN)SourceBuffer,
+      (EFI_PHYSICAL_ADDRESS)((UINTN)SourceBuffer + SourceSize)
+      ));
     return FALSE;
   }
 
@@ -882,19 +924,14 @@ InternalEfiBootRtGetKcgOffset (
   IN  UINTN                     SourceSize
   )
 {
-  EFI_STATUS                  Status;
-  BOOLEAN                     Overflow;
-  APPLE_SECURE_BOOT_PROTOCOL  *SecureBoot;
-  UINT8                       Policy;
-  EFI_HANDLE                  EfiBootRtCopyHandle;
-  APPLE_EFI_BOOT_RT_INFO      EfiBootRtLoadOptions;
-  UINTN                       KcgOffset;
-  EFI_LOADED_IMAGE_PROTOCOL   *LoadedImage;
-  UINTN                       ImageBase;
+  EFI_STATUS                 Status;
+  BOOLEAN                    Overflow;
+  EFI_HANDLE                 EfiBootRtCopyHandle;
+  APPLE_EFI_BOOT_RT_INFO     EfiBootRtLoadOptions;
+  UINTN                      KcgOffset;
+  EFI_LOADED_IMAGE_PROTOCOL  *LoadedImage;
+  UINTN                      ImageBase;
 
-  SecureBoot = OcAppleSecureBootGetProtocol ();
-  ASSERT (SecureBoot != NULL);
-  SecureBoot->GetPolicy (SecureBoot, &Policy);
   //
   // Load a copy of EfiBootRt to retrieve its information structure. EfiBootRt
   // must be loaded with the OpenCore image loader as it is not signed. This is
@@ -909,6 +946,7 @@ InternalEfiBootRtGetKcgOffset (
              &EfiBootRtCopyHandle
              );
   if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "OCABC: KCG load - %r\n", Status));
     return 0;
   }
 
@@ -922,6 +960,7 @@ InternalEfiBootRtGetKcgOffset (
                   (VOID **)&LoadedImage
                   );
   if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "OCABC: Handle KCG LoadedImage - %r\n", Status));
     gBS->UnloadImage (EfiBootRtCopyHandle);
     return 0;
   }
@@ -941,6 +980,7 @@ InternalEfiBootRtGetKcgOffset (
   gBS->UnloadImage (EfiBootRtCopyHandle);
 
   if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "OCABC: KCG start - %r\n", Status));
     return 0;
   }
 
@@ -958,6 +998,13 @@ InternalEfiBootRtGetKcgOffset (
                 KcgSize
                 );
   if (Overflow) {
+    DEBUG ((
+      DEBUG_INFO,
+      "OCABC: KCG OOB (0x%llx, [0x%llx, 0x%llx)\n",
+      (UINT64)(UINTN)EfiBootRtLoadOptions.KernelCallGate,
+      (UINT64)ImageBase,
+      (UINT64)(ImageBase + SourceSize)
+      ));
     return 0;
   }
 
@@ -989,6 +1036,9 @@ OcLoadImage (
   UINTN                      KcgSize;
 
   BootCompat = GetBootCompatContext ();
+
+  DebugPrintDevicePath (DEBUG_INFO, "OCABC: EfiBootRt candidate", DevicePath);
+
   //
   // Verify whether it's EfiBootRt that's being loaded. If it is, patch its
   // kernel call gate. This is relevant as of macOS 13 Developer Beta 1, as
@@ -1004,6 +1054,14 @@ OcLoadImage (
                     BootCompat->ServiceState.LastAppleBootImage
                     );
   }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "OCABC: IsEfiBootRt %d (BP %d, Apple %d)\n",
+    IsEfiBootRt,
+    !BootPolicy,
+    BootCompat->ServiceState.AppleBootNestedCount > 0
+    ));
 
   //
   // Anything but EfiBootRt can be loaded transparently. EfiBootRt must be
@@ -1030,6 +1088,7 @@ OcLoadImage (
                       ImageHandle
                       );
   if (EFI_ERROR (LoadImageStatus)) {
+    DEBUG ((DEBUG_INFO, "OCABC: EfiBootRt load - %r\n", LoadImageStatus));
     return LoadImageStatus;
   }
 
@@ -1044,6 +1103,12 @@ OcLoadImage (
                 SourceSize
                 );
   if ((KcgOffset == 0) || (KcgSize < CALL_GATE_MIN_SIZE)) {
+    DEBUG ((
+      DEBUG_INFO,
+      "OCABC: Invalid KCG [0x%llx, 0x%llx)\n",
+      (UINT64)KcgOffset,
+      (UINT64)KcgSize
+      ));
     return LoadImageStatus;
   }
 
@@ -1053,6 +1118,7 @@ OcLoadImage (
                   (VOID **)&LoadedImage
                   );
   if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "OCABC: Handle EfiBootRt LoadedImage - %r\n", Status));
     return LoadImageStatus;
   }
 
@@ -1064,6 +1130,12 @@ OcLoadImage (
     (UINTN)LoadedImage->ImageBase + KcgOffset,
     (UINTN)AppleMapPrepareKernelStateNew
     );
+
+  DEBUG ((
+    DEBUG_INFO,
+    "OCABC: Patched KCG at 0x%llx\n",
+    (UINTN)LoadedImage->ImageBase + KcgOffset
+    ));
 
   return LoadImageStatus;
 }
@@ -1561,9 +1633,6 @@ InstallServiceOverrides (
 
   gBS->Hdr.CRC32 = 0;
   gBS->Hdr.CRC32 = CalculateCrc32 (gBS, gBS->Hdr.HeaderSize);
-
-  gRT->Hdr.CRC32 = 0;
-  gRT->Hdr.CRC32 = CalculateCrc32 (gRT, gRT->Hdr.HeaderSize);
 
   gBS->RestoreTPL (OriginalTpl);
 
