@@ -21,7 +21,7 @@ jobs:
     env:
       JOB_TYPE: BUILD
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: 安装Linux工具链
         run: brew tap FiloSottile/homebrew-musl-cross
@@ -46,7 +46,7 @@ jobs:
       - run: ./build_oc.tool
 
       - name: 打包上传工作件
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: OpenCore_macOS_build
           path: Binaries/*.zip
@@ -63,7 +63,7 @@ jobs:
     name: linux-CLANGPDB/GCC5
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: 安装依赖环境
         run: |
@@ -84,7 +84,7 @@ jobs:
       - run: ./build_oc.tool
 
       - name: 打包上传构建工件
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: OpenCore_Linux_build
           path: Binaries/*.zip
@@ -99,7 +99,7 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: 安装依赖
         run: |
@@ -114,7 +114,7 @@ jobs:
       - run: ./build_oc.tool
 
       - name: 打包上传构建工件
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Windows_build_OpenCore
           path: Binaries/*.zip
