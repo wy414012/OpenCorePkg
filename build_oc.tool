@@ -161,6 +161,7 @@ package() {
       "AudioDxe.efi"
       "BiosVideo.efi"
       "CrScreenshotDxe.efi"
+      "Ext4Dxe.efi"
       "HiiDatabase.efi"
       "NvmExpressDxe.efi"
       "OpenCanopy.efi"
