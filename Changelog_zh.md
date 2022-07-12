@@ -1,5 +1,38 @@
 OpenCore Changelog
 ==================
+#### v0.8.0
+- 合并主库中0.8.x版本
+- 添加了 ext4 文件系统驱动
+- 添加了对 macOS 13 DP3 内核集合的支持
+- `--force-device`为 AudioDxe添加了选项，允许 HDA 控制器上的 UEFI 音频误报为非 HDA 音频设备
+- 提供可选的不安全快速文件记录（仅适用于具有完全兼容 FAT32 驱动程序的固件）
+- 修复了无缓存注入期间不正确的 OSBundleLibraries_x86_64 处理
+- 合并v0.8.2
+- AppleCpuPmCfgLock已在 macOS 13 上修复
+- `DummyPowerManagement`已在 macOS 13 上修复
+- 更新了 SMBIOS 和其余部分的内置固件版本
+- AvoidRuntimeDefrag添加了对Booter quirk的 macOS 13 支持
+- 在 DEBUG 构建中添加了注入的 kext 捆绑版本打印
+- 为 `CreateVault` 脚本添加了 Linux 兼容性
+- 合并主库v0.8.1
+- 改进ExtendBTFeatureFlags了较新 macOS 版本的怪癖，谢谢@lvs1974
+- 添加了有关 DMAR 表和的注释ForceAquantiaEthernet，谢谢@kokowski
+- 在属性中添加了系统选项`LauncherOption`，谢谢@stevezhengshiqi
+- 更新了关于CustomPciSerialDevice, thx @joevt 的说明
+- 为 `NTFS` 添加了只读驱动程序
+- 切换`Reset NVRAM`到Toggle SIP可配置的引导入口协议驱动程序
+- 支持可选的 Apple 固件原生 NVRAM 重置，感谢 @Syncretic
+- 支持的 `NVRAM` 重置可选择保留 BIOS 引导条目
+- 切换 SIP支持的用户指定csr-active-config值
+- 添加了可选Enabled和Disabled风格Toggle SIP（允许主题设计师提供不同的图标）
+- 为 Hyper-V Gen1 VM 上的 TSC 计算添加了 PIIX4 ACPI PM 计时器检测
+- 合并v0.8.0
+- 添加了对早期日志保存的支持
+- 在脚本中切换到 Python 3（用于python /path/to/script强制 Python 2）
+- 添加ForceAquantiaEthernet了基于 Aquantia AQtion AQC-107s 的 10GbE 网卡支持，感谢 @Mieze 和 @Shikumo
+- 更新了 SMBIOS 和其余部分的内置固件版本
+- 添加Misc->Serial部分以自定义串行端口属性
+- 为 XNU添加CustomPciSerialDevice了怪癖以正确识别定制的外部串行设备
 #### v0.7.9
 - 添加了文件无法显示时使用的自动检测`macOS Installer`卷名`.disk_label`
 - 向 `AudioDxe`添加`--restore-nosnoop`了标志，使 v0.7.7 修复了 Windows 声音选择加入
