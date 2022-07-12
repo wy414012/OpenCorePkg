@@ -83,13 +83,13 @@ ENTRY_POINT (
   PcdGet32 (PcdFixedDebugPrintErrorLevel) |= DEBUG_INFO;
   PcdGet32 (PcdDebugPrintErrorLevel)      |= DEBUG_INFO;
 
-  DEBUG ((DEBUG_ERROR, "\nNOTE: This version of ocvalidate is only compatible with OpenCore version %a!\n\n", OPEN_CORE_VERSION));
+  DEBUG ((DEBUG_ERROR, "\n注意：此版本的 ocvalidate 仅与 OpenCore %a 版本兼容 !\n\n", OPEN_CORE_VERSION));
 
   //
   // Print usage.
   //
   if (argc != 2) {
-    DEBUG ((DEBUG_ERROR, "Usage: %a <path/to/config.plist>\n\n", argv[0]));
+    DEBUG ((DEBUG_ERROR, "用法: %a <path/to/config.plist>\n\n", argv[0]));
     return -1;
   }
 
@@ -99,7 +99,7 @@ ENTRY_POINT (
   ConfigFileName   = argv[1];
   ConfigFileBuffer = UserReadFile (ConfigFileName, &ConfigFileSize);
   if (ConfigFileBuffer == NULL) {
-    DEBUG ((DEBUG_ERROR, "Failed to read %a\n", ConfigFileName));
+    DEBUG ((DEBUG_ERROR, "读取失败 %a\n", ConfigFileName));
     return -1;
   }
 
@@ -113,12 +113,12 @@ ENTRY_POINT (
   //
   Status = OcConfigurationInit (&Config, ConfigFileBuffer, ConfigFileSize, &ErrorCount);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Invalid config\n"));
+    DEBUG ((DEBUG_ERROR, "无效的配置\n"));
     return -1;
   }
 
   if (ErrorCount > 0) {
-    DEBUG ((DEBUG_ERROR, "Serialisation returns %u %a!\n", ErrorCount, ErrorCount > 1 ? "errors" : "error"));
+    DEBUG ((DEBUG_ERROR, "序列化返回 %u %a!\n", ErrorCount, ErrorCount > 1 ? "errors" : "error"));
   }
 
   //
@@ -133,14 +133,14 @@ ENTRY_POINT (
   if (ErrorCount == 0) {
     DEBUG ((
       DEBUG_ERROR,
-      "Completed validating %a in %llu ms. No issues found.\n",
+      "完成验证%a 耗时 %llu 毫秒. 未发现任何问题。\n",
       ConfigFileName,
       GetCurrentTimestamp () - ExecTimeStart
       ));
   } else {
     DEBUG ((
       DEBUG_ERROR,
-      "Completed validating %a in %llu ms. Found %u %a requiring attention.\n",
+      "完成验证 %a 耗时 %llu 毫秒. 发现 %u %a 需要注意.\n",
       ConfigFileName,
       GetCurrentTimestamp () - ExecTimeStart,
       ErrorCount,
