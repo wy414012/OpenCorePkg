@@ -64,6 +64,7 @@ Utilities/ocpasswordgen/ocpasswordgen
 Utilities/ocvalidate/ocvalidate
 Utilities/ocvalidate/*.plist
 Utilities/LogoutHook/nvramdump
+Utilities/RsaTool/libressl
 Utilities/RsaTool/RsaTool
 Utilities/TestBmf/Bmf
 Utilities/TestCpuFrequency/CpuFrequency
@@ -82,3 +83,4 @@ Utilities/TestRsaPreprocess/RsaPreprocess
 Utilities/TestSmbios/Smbios
 Utilities/TestPeCoff/PeCoff
 Utilities/TestNtfsDxe/TestNtfsDxe
+Utilities/TestExt4Dxe/TestExt4Dxe
