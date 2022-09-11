@@ -16,7 +16,7 @@ env:
 
 jobs:
     build-linux:
-    name: linux-CLANGPDB/GCC5
+    name: linux-build
     runs-on: [self-hosted]
     env:
       JOB_TYPE: BUILD
