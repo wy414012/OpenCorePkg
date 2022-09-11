@@ -15,18 +15,19 @@ env:
   WERROR: 1
 
 jobs:
-    build-linux:
-
+  build-linux:
+    name: 使用 linux-latest
     runs-on: [self-hosted]
     env:
       JOB_TYPE: BUILD
     steps:
       - uses: actions/checkout@v3
 
+      - name: 更新ubuntu
+        run: sudo apt-get update
+
       - name: 安装依赖环境
-        run: |
-          sudo apt-get update
-          sudo apt-get install nasm uuid-dev libssl-dev iasl
+        run: sudo apt-get install nasm uuid-dev libssl-dev iasl
           file="clang+llvm-13.0.0-x86_64-linux-gnu-ubuntu-20.04"
           suf=".tar.xz"
           curl -LO "https://github.com/llvm/llvm-project/releases/download/llvmorg-13.0.0/${file}${suf}" || exit 1
@@ -35,14 +36,25 @@ jobs:
           if [ "$sum" != "$expsum" ]; then echo "Invalid checksum $sum" ; exit 1 ; fi
           tar -xf "${file}${suf}" || exit 1
           echo "$(pwd)/${file}/bin" >> $GITHUB_PATH
+
       - name: CI Bootstrap
         run: |
           src=$(/usr/bin/curl -Lfs https://raw.githubusercontent.com/wy414012/ocbuild/Yaming/ci-bootstrap.sh) && eval "$src" || exit 1
+
       - run: ./build_duet.tool
       - run: ./build_oc.tool
 
-      - name: 打包上传构建工件
+      - name: 打包上传工作件
         uses: actions/upload-artifact@v3
         with:
-          name: OpenCore_Linux_build
+          name: OpenCore_macOS_build
           path: Binaries/*.zip
+
+      - name: 上传发布版本
+        if: github.event_name == 'release'
+        uses: svenstaro/upload-release-action@483c1e56f95e88835747b1c7c60581215016cbf2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: Binaries/*.zip
+          tag: ${{ github.ref }}
+          file_glob: true
