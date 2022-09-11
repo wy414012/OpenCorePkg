@@ -16,12 +16,13 @@ env:
 
 jobs:
     build-linux:
-      name: linux-CLANGPDB/GCC5
-      runs-on: [self-hosted]
-      env:
+    name: linux-CLANGPDB/GCC5
+    runs-on: [self-hosted]
+    env:
       JOB_TYPE: BUILD
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
       - name: 安装依赖环境
         run: |
           sudo apt-get update
