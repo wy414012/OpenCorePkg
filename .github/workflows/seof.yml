@@ -16,8 +16,10 @@ env:
 
 jobs:
     build-linux:
-    name: linux-CLANGPDB/GCC5
-    runs-on: [self-hosted]
+      name: linux-CLANGPDB/GCC5
+      runs-on: [self-hosted]
+      env:
+      JOB_TYPE: BUILD
     steps:
       - uses: actions/checkout@v3
 
