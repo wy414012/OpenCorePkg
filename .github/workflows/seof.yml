@@ -21,6 +21,7 @@ jobs:
       env:
       JOB_TYPE: BUILD
     steps:
+      - uses: actions/checkout@v2
       - name: 安装依赖环境
         run: |
           sudo apt-get update
