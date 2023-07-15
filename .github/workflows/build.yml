@@ -207,8 +207,7 @@ jobs:
 
       - name: 安装构建环境
         run: |
-          choco install make nasm zip --no-progress
-          choco install iasl --no-progress --version=2017.11.10
+          choco install make nasm zip iasl --no-progress
 
       - name: CI引导
         run: |
