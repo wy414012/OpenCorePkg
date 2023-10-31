@@ -155,6 +155,12 @@ choose_debugger() {
       export EFI_TRIPLE="${triple_arch}-linux-gnu"
     fi
   fi
+
+  if [ "${CPU_ARCH}" = "X64" ]; then
+    lldb_target_definition="settings set plugin.process.gdb-remote.target-definition-file Scripts/x86_64_target_definition.py"
+  else
+    lldb_target_definition="settings set target.default-arch ${EFI_TRIPLE}"
+  fi
 }
 
 choose_debugger
@@ -168,7 +174,7 @@ if [ "${EFI_DEBUGGER}" = "GDB" ] || [ "${EFI_DEBUGGER}" = "gdb" ]; then
     -ex "b DebugBreak" \
     "${EFI_SYMS}"
 elif [ "${EFI_DEBUGGER}" = "LLDB" ] || [ "${EFI_DEBUGGER}" = "lldb" ]; then
-  "$LLDB" -o "settings set plugin.process.gdb-remote.target-definition-file Scripts/x86_64_target_definition.py" \
+  "$LLDB" -o "${lldb_target_definition}" \
     -o "gdb-remote ${EFI_HOST}:${EFI_PORT}" \
     -o "target create ${EFI_SYMS_PDB} ${EFI_SYMS}" \
     -o "command script import Scripts/lldb_uefi.py" \

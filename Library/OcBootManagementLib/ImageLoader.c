@@ -78,6 +78,7 @@ STATIC EFI_HANDLE        mCurrentImageHandle;
 STATIC OC_IMAGE_LOADER_PATCH      mImageLoaderPatch;
 STATIC OC_IMAGE_LOADER_CONFIGURE  mImageLoaderConfigure;
 STATIC UINT32                     mImageLoaderCaps;
+STATIC EFI_HANDLE                 mImageLoaderCapsHandle;
 STATIC BOOLEAN                    mImageLoaderEnabled;
 
 STATIC BOOLEAN  mProtectUefiServices;
@@ -269,6 +270,17 @@ OcImageLoaderLoad (
   OC_LOADED_IMAGE_PROTOCOL         *OcLoadedImage;
   EFI_LOADED_IMAGE_PROTOCOL        *LoadedImage;
 
+  //
+  // For OcImageLoaderLoad always assume target default.
+  //
+ #ifdef MDE_CPU_IA32
+  mImageLoaderCaps = OC_KERN_CAPABILITY_K32_U32 | OC_KERN_CAPABILITY_K32_U64;
+ #else
+  mImageLoaderCaps = OC_KERN_CAPABILITY_K64_U64;
+ #endif
+
+  mImageLoaderCapsHandle = NULL;
+
   ASSERT (SourceBuffer != NULL);
 
   //
@@ -409,6 +421,8 @@ OcImageLoaderLoad (
     FreeAlignedPages (DestinationBuffer, DestinationPages);
     return Status;
   }
+
+  mImageLoaderCapsHandle = *ImageHandle;
 
   DEBUG ((DEBUG_VERBOSE, "OCB: Loaded image at %p\n", *ImageHandle));
 
@@ -773,6 +787,8 @@ InternalEfiLoadImage (
   VOID        *AllocatedBuffer;
   UINT32      RealSize;
 
+  mImageLoaderCapsHandle = NULL;
+
   if ((ParentImageHandle == NULL) || (ImageHandle == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -924,6 +940,8 @@ InternalEfiLoadImage (
     InternalUpdateLoadedImage (*ImageHandle, DevicePath);
   }
 
+  mImageLoaderCapsHandle = *ImageHandle;
+
   return Status;
 }
 
@@ -939,6 +957,13 @@ InternalEfiStartImage (
   EFI_STATUS                 Status;
   OC_LOADED_IMAGE_PROTOCOL   *OcLoadedImage;
   EFI_LOADED_IMAGE_PROTOCOL  *LoadedImage;
+
+  if (  (mImageLoaderConfigure  != NULL)
+     && (ImageHandle != mImageLoaderCapsHandle))
+  {
+    DEBUG ((DEBUG_ERROR, "OCB: load/start unsupported ordering, %p != %p\n", ImageHandle, mImageLoaderCapsHandle));
+    return EFI_INVALID_PARAMETER;
+  }
 
   //
   // If we loaded the image, invoke the entry point manually.
