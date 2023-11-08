@@ -12,7 +12,7 @@
   DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED \
   | DEBUG_PROPERTY_DEBUG_PRINT_ENABLED \
   | DEBUG_PROPERTY_ASSERT_BREAKPOINT_ENABLED )
-#define _PCD_VALUE_PcdDebugRaisePropertyMask            DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED
+#define _PCD_VALUE_PcdDebugRaisePropertyMask            0U ///< Can use e.g. DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED
 #define _PCD_VALUE_PcdDebugClearMemoryValue             0xAFU
 #define _PCD_VALUE_PcdFixedDebugPrintErrorLevel         0x80000002U
 #define _PCD_VALUE_PcdDebugPrintErrorLevel              0x80000002U
@@ -42,7 +42,7 @@ BOOLEAN  _gPcd_FixedAtBuild_PcdImageLoaderHashProhibitOverlap        = TRUE;
 BOOLEAN  _gPcd_FixedAtBuild_PcdImageLoaderLoadHeader                 = TRUE;
 BOOLEAN  _gPcd_FixedAtBuild_PcdImageLoaderDebugSupport               = TRUE;
 BOOLEAN  _gPcd_FixedAtBuild_PcdImageLoaderAllowMisalignedOffset      = FALSE;
-BOOLEAN  _gPcd_FixedAtBuild_PcdImageLoaderRemoveXForWX               = FALSE;
+BOOLEAN  _gPcd_FixedAtBuild_PcdImageLoaderRemoveXForWX               = TRUE;
 BOOLEAN  _gPcd_FixedAtBuild_PcdImageLoaderWXorX                      = TRUE;
 UINT32   _gPcd_FixedAtBuild_PcdImageLoaderAlignmentPolicy            = 0xFFFFFFFF;
 UINT32   _gPcd_FixedAtBuild_PcdImageLoaderRelocTypePolicy            = 0x00;
