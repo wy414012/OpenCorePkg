@@ -3,7 +3,11 @@ OpenCore Changelog
 #### v0.9.7
 - Updated recovery_urls.txt
 - Changed OpenDuet to enforce `W^X` settings rather than fixing them in loaded images
-- Updated `FixupAppleEfiImages` quirk to fix `W^X` errors in Apple signed binaries from 10.7-10.12
+- Updated `FixupAppleEfiImages` quirk to fix `W^X` errors in all non-Secure Boot Apple signed binaries
+- Updated builtin firmware versions for SMBIOS and the rest
+- Updated `AppleEfiSignTool` to work with new PE COFF loader
+- Fixed recovery failing to boot on some systems
+- Updated `ProvideCurrentCpuInfo` quirk to support CPUID leaf 0x2 cache size reporting on Mac OS X 10.5 and 10.6
 
 #### v0.9.6
 - Updated builtin firmware versions for SMBIOS and the rest

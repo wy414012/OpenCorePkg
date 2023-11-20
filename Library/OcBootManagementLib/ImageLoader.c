@@ -23,6 +23,8 @@
 #include <Guid/GlobalVariable.h>
 #include <Guid/OcVariable.h>
 
+#include <AppleMacEfi/AppleMacEfiSpec.h>
+
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/OcDebugLogLib.h>
@@ -56,6 +58,10 @@ STATIC EFI_GUID  mOcLoadedImageProtocolGuid = {
   0x1f3c963d, 0xf9dc, 0x4537, { 0xbb, 0x06, 0xd8, 0x08, 0x46, 0x4a, 0x85, 0x2e }
 };
 
+STATIC EFI_GUID  mOcImageLoaderCapsProtocolGuid = {
+  0xf5bbca36, 0x0f99, 0x4e7b, { 0x86, 0x0f, 0x92, 0x06, 0xa9, 0x3b, 0x52, 0xd0 }
+};
+
 typedef struct {
   EFI_IMAGE_ENTRY_POINT        EntryPoint;
   EFI_PHYSICAL_ADDRESS         ImageArea;
@@ -70,6 +76,10 @@ typedef struct {
   EFI_LOADED_IMAGE_PROTOCOL    LoadedImage;
 } OC_LOADED_IMAGE_PROTOCOL;
 
+typedef struct {
+  UINT32    ImageCaps;
+} OC_IMAGE_LOADER_CAPS_PROTOCOL;
+
 STATIC EFI_IMAGE_LOAD    mOriginalEfiLoadImage;
 STATIC EFI_IMAGE_START   mOriginalEfiStartImage;
 STATIC EFI_IMAGE_UNLOAD  mOriginalEfiUnloadImage;
@@ -78,8 +88,6 @@ STATIC EFI_HANDLE        mCurrentImageHandle;
 
 STATIC OC_IMAGE_LOADER_PATCH      mImageLoaderPatch;
 STATIC OC_IMAGE_LOADER_CONFIGURE  mImageLoaderConfigure;
-STATIC UINT32                     mImageLoaderCaps;
-STATIC EFI_HANDLE                 mImageLoaderCapsHandle;
 STATIC BOOLEAN                    mImageLoaderEnabled;
 
 STATIC BOOLEAN  mProtectUefiServices;
@@ -272,17 +280,6 @@ OcImageLoaderLoad (
   OC_LOADED_IMAGE_PROTOCOL         *OcLoadedImage;
   EFI_LOADED_IMAGE_PROTOCOL        *LoadedImage;
 
-  //
-  // For OcImageLoaderLoad always assume target default.
-  //
- #ifdef MDE_CPU_IA32
-  mImageLoaderCaps = OC_KERN_CAPABILITY_K32_U32 | OC_KERN_CAPABILITY_K32_U64;
- #else
-  mImageLoaderCaps = OC_KERN_CAPABILITY_K64_U64;
- #endif
-
-  mImageLoaderCapsHandle = NULL;
-
   ASSERT (SourceBuffer != NULL);
 
   //
@@ -423,8 +420,6 @@ OcImageLoaderLoad (
     FreeAlignedPages (DestinationBuffer, DestinationPages);
     return Status;
   }
-
-  mImageLoaderCapsHandle = *ImageHandle;
 
   DEBUG ((DEBUG_VERBOSE, "OCB: Loaded image at %p\n", *ImageHandle));
 
@@ -784,15 +779,17 @@ InternalEfiLoadImage (
   OUT EFI_HANDLE                *ImageHandle
   )
 {
-  EFI_STATUS  SecureBootStatus;
-  EFI_STATUS  FilterStatus;
-  EFI_STATUS  Status;
-  VOID        *AllocatedBuffer;
-  UINT32      RealSize;
-  UINT32      SignedFileSize;
-  BOOLEAN     IsFat;
-
-  mImageLoaderCapsHandle = NULL;
+  EFI_STATUS                     SecureBootStatus;
+  EFI_STATUS                     FilterStatus;
+  EFI_STATUS                     Status;
+  VOID                           *AllocatedBuffer;
+  OC_IMAGE_LOADER_CAPS_PROTOCOL  *OcImageLoaderCaps;
+  UINT32                         RealSize;
+  UINT32                         SignedFileSize;
+  BOOLEAN                        IsFatSlice;
+  CHAR16                         *FilePath;
+  BOOLEAN                        FixupRequired;
+  BOOLEAN                        AppleBootPath;
 
   if ((ParentImageHandle == NULL) || (ImageHandle == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -806,7 +803,8 @@ InternalEfiLoadImage (
     return EFI_UNSUPPORTED;
   }
 
-  AllocatedBuffer = NULL;
+  OcImageLoaderCaps = NULL;
+  AllocatedBuffer   = NULL;
   if (SourceBuffer == NULL) {
     Status = InternalEfiLoadImageFile (
                DevicePath,
@@ -848,15 +846,6 @@ InternalEfiLoadImage (
     return EFI_SECURITY_VIOLATION;
   }
 
-  //
-  // By default assume target default.
-  //
- #ifdef MDE_CPU_IA32
-  mImageLoaderCaps = OC_KERN_CAPABILITY_K32_U32 | OC_KERN_CAPABILITY_K32_U64;
- #else
-  mImageLoaderCaps = OC_KERN_CAPABILITY_K64_U64;
- #endif
-
   if (SourceBuffer != NULL) {
     RealSize = (UINT32)SourceSize;
  #ifdef MDE_CPU_IA32
@@ -865,55 +854,86 @@ InternalEfiLoadImage (
     FilterStatus = FatFilterArchitecture64 ((UINT8 **)&SourceBuffer, &RealSize);
  #endif
 
-    IsFat = !EFI_ERROR (FilterStatus) && (RealSize != SourceSize) && (RealSize >= EFI_PAGE_SIZE);
+    IsFatSlice = !EFI_ERROR (FilterStatus) && (RealSize != SourceSize) && (RealSize >= EFI_PAGE_SIZE);
 
-    if (IsFat) {
-      mImageLoaderCaps = DetectCapabilities (SourceBuffer, RealSize);
-    }
-
-    //
-    // Use mImageLoaderConfigure != NULL as a proxy for loaded kernel support,
-    // and only apply FixupAppleEfiImages while this is set.
-    //
-    if (mFixupAppleEfiImages && (mImageLoaderConfigure != NULL)) {
-      if (SecureBootStatus == EFI_SUCCESS) {
-        DEBUG ((DEBUG_INFO, "OCB: Secure boot, fixup efi ignored\n"));
-        Status = EFI_SUCCESS;
-      } else if (IsFat) {
-        DEBUG ((DEBUG_INFO, "OCB: Fat binary, fixup efi...\n"));
-        Status = OcPatchLegacyEfi (SourceBuffer, RealSize);
-      } else {
-        //
-        // Overlapping sections not expected outside of fat binaries (and even then
-        // only in 32-bit slices), so verify signature allowing for W^X errors only.
-        //
-        SignedFileSize = RealSize;
-        Status         = PeCoffVerifyAppleSignature (SourceBuffer, &SignedFileSize);
-        if (!EFI_ERROR (Status)) {
-          DEBUG ((
-            DEBUG_INFO,
-            "OCB: Apple signed binary %u->%u, fixup efi...\n",
-            RealSize,
-            SignedFileSize
-            ));
-          RealSize = SignedFileSize;
-          Status   = OcPatchLegacyEfi (SourceBuffer, RealSize);
-        } else {
-          DEBUG ((DEBUG_INFO, "OCB: Not Apple signed binary, fixup efi ignored\n"));
-          Status = EFI_SUCCESS;
-        }
-      }
-
-      //
-      // Error can mean incompletely patched image, so we should fail.
-      // Any error not the result of incomplete patching would in general not load anyway.
-      //
-      if (EFI_ERROR (Status)) {
+    if (IsFatSlice) {
+      OcImageLoaderCaps = AllocateZeroPool (sizeof (*OcImageLoaderCaps));
+      if (OcImageLoaderCaps == NULL) {
         if (AllocatedBuffer != NULL) {
           FreePool (AllocatedBuffer);
         }
 
-        return Status;
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      OcImageLoaderCaps->ImageCaps = DetectCapabilities (SourceBuffer, RealSize);
+    }
+
+    //
+    // We apply to all images (not just boot images which can be detected
+    // by using mImageLoaderConfigure != NULL as a proxy for loaded kernel
+    // support) because we need to fix up other Apple files such as apfs.efi.
+    //
+    if (mFixupAppleEfiImages) {
+      if (SecureBootStatus == EFI_SUCCESS) {
+        DEBUG ((DEBUG_INFO, "OCB: Secure boot, fixup efi ignored\n"));
+        FixupRequired = FALSE;
+      } else if (IsFatSlice) {
+        DEBUG ((DEBUG_INFO, "OCB: Fat binary, fixup efi...\n"));
+        FixupRequired = TRUE;
+      } else {
+        AppleBootPath = FALSE;
+        if (DevicePath != NULL) {
+          Status = OcBootPolicyDevicePathToFilePath (
+                     DevicePath,
+                     &FilePath
+                     );
+          if (!EFI_ERROR (Status)) {
+            AppleBootPath = (StrCmp (FilePath, APPLE_BOOTER_DEFAULT_FILE_NAME) == 0);
+            FreePool (FilePath);
+          }
+        }
+
+        if (AppleBootPath) {
+          DEBUG ((DEBUG_INFO, "OCB: Apple booter path, fixup efi...\n"));
+          FixupRequired = TRUE;
+        } else {
+          //
+          // Overlapping sections not expected outside of fat binaries (and even then
+          // only in 32-bit slices), so verify signature allowing for W^X errors only.
+          //
+          SignedFileSize = RealSize;
+          Status         = PeCoffVerifyAppleSignature (SourceBuffer, &SignedFileSize);
+          if (!EFI_ERROR (Status)) {
+            DEBUG ((
+              DEBUG_INFO,
+              "OCB: Apple signed binary %u->%u, fixup efi...\n",
+              RealSize,
+              SignedFileSize
+              ));
+            RealSize      = SignedFileSize;
+            FixupRequired = TRUE;
+          } else {
+            DEBUG ((DEBUG_INFO, "OCB: Not Apple signed binary, fixup efi ignored\n"));
+            FixupRequired = FALSE;
+          }
+        }
+      }
+
+      if (FixupRequired) {
+        Status = OcPatchLegacyEfi (SourceBuffer, RealSize);
+
+        //
+        // Error can mean incompletely patched image, so we should fail.
+        // Any error not the result of incomplete patching would in general not load anyway.
+        //
+        if (EFI_ERROR (Status)) {
+          if (AllocatedBuffer != NULL) {
+            FreePool (AllocatedBuffer);
+          }
+
+          return Status;
+        }
       }
     }
 
@@ -924,7 +944,7 @@ InternalEfiLoadImage (
       (UINT32)SourceSize,
       SourceBuffer,
       RealSize,
-      mImageLoaderCaps,
+      OcImageLoaderCaps == NULL ? 0 : OcImageLoaderCaps->ImageCaps,
       FilterStatus
       ));
 
@@ -948,7 +968,7 @@ InternalEfiLoadImage (
   // Load the image ourselves in secure boot mode.
   //
   if (SecureBootStatus == EFI_SUCCESS) {
-    if (SourceBuffer != NULL) {
+    if ((SourceBuffer != NULL) && (OcImageLoaderCaps == NULL)) {
       Status = OcImageLoaderLoad (
                  FALSE,
                  ParentImageHandle,
@@ -959,9 +979,10 @@ InternalEfiLoadImage (
                  );
     } else {
       //
-      // We verified the image, but contained garbage.
-      // This should not happen, just abort.
+      // We verified the image, but contained garbage, or we are trying to secure boot a Fat slice.
+      // This should not happen.
       //
+      ASSERT (FALSE);
       Status = EFI_UNSUPPORTED;
     }
   } else {
@@ -975,6 +996,25 @@ InternalEfiLoadImage (
                ImageHandle
                );
     RestoreGrubShimHooks ("LoadImage");
+
+    if (!EFI_ERROR (Status) && (OcImageLoaderCaps != NULL)) {
+      Status = gBS->InstallMultipleProtocolInterfaces (
+                      ImageHandle,
+                      &mOcImageLoaderCapsProtocolGuid,
+                      OcImageLoaderCaps,
+                      NULL
+                      );
+      if (!EFI_ERROR (Status)) {
+        OcImageLoaderCaps = NULL;
+      } else {
+        DEBUG ((DEBUG_INFO, "OCB: LoaderCaps proto install error - %r\n", Status));
+        mOriginalEfiUnloadImage (ImageHandle);
+      }
+    }
+  }
+
+  if (OcImageLoaderCaps != NULL) {
+    FreePool (OcImageLoaderCaps);
   }
 
   if (AllocatedBuffer != NULL) {
@@ -989,8 +1029,6 @@ InternalEfiLoadImage (
     InternalUpdateLoadedImage (*ImageHandle, DevicePath);
   }
 
-  mImageLoaderCapsHandle = *ImageHandle;
-
   return Status;
 }
 
@@ -1003,16 +1041,20 @@ InternalEfiStartImage (
   OUT CHAR16      **ExitData OPTIONAL
   )
 {
-  EFI_STATUS                 Status;
-  OC_LOADED_IMAGE_PROTOCOL   *OcLoadedImage;
-  EFI_LOADED_IMAGE_PROTOCOL  *LoadedImage;
+  EFI_STATUS                     Status;
+  OC_LOADED_IMAGE_PROTOCOL       *OcLoadedImage;
+  EFI_LOADED_IMAGE_PROTOCOL      *LoadedImage;
+  OC_IMAGE_LOADER_CAPS_PROTOCOL  *OcImageLoaderCaps;
+  UINT32                         Caps;
 
-  if (  (mImageLoaderConfigure  != NULL)
-     && (ImageHandle != mImageLoaderCapsHandle))
-  {
-    DEBUG ((DEBUG_ERROR, "OCB: load/start unsupported ordering, %p != %p\n", ImageHandle, mImageLoaderCapsHandle));
-    return EFI_INVALID_PARAMETER;
-  }
+  //
+  // Use target default except where we detected and saved other caps on load.
+  //
+ #ifdef MDE_CPU_IA32
+  Caps = OC_KERN_CAPABILITY_K32_U32 | OC_KERN_CAPABILITY_K32_U64;
+ #else
+  Caps = OC_KERN_CAPABILITY_K64_U64;
+ #endif
 
   //
   // If we loaded the image, invoke the entry point manually.
@@ -1029,7 +1071,7 @@ InternalEfiStartImage (
     if (mImageLoaderConfigure != NULL) {
       mImageLoaderConfigure (
         &OcLoadedImage->LoadedImage,
-        mImageLoaderCaps
+        Caps
         );
     }
 
@@ -1051,9 +1093,18 @@ InternalEfiStartImage (
                     (VOID **)&LoadedImage
                     );
     if (!EFI_ERROR (Status)) {
+      Status = gBS->HandleProtocol (
+                      ImageHandle,
+                      &mOcImageLoaderCapsProtocolGuid,
+                      (VOID **)&OcImageLoaderCaps
+                      );
+      if (!EFI_ERROR (Status)) {
+        Caps = OcImageLoaderCaps->ImageCaps;
+      }
+
       mImageLoaderConfigure (
         LoadedImage,
-        mImageLoaderCaps
+        Caps
         );
     }
   }
@@ -1072,8 +1123,9 @@ InternalEfiUnloadImage (
   IN  EFI_HANDLE  ImageHandle
   )
 {
-  EFI_STATUS                Status;
-  OC_LOADED_IMAGE_PROTOCOL  *OcLoadedImage;
+  EFI_STATUS                     Status;
+  OC_LOADED_IMAGE_PROTOCOL       *OcLoadedImage;
+  OC_IMAGE_LOADER_CAPS_PROTOCOL  *OcImageLoaderCaps;
 
   //
   // If we loaded the image, do the unloading manually.
@@ -1088,6 +1140,28 @@ InternalEfiUnloadImage (
              OcLoadedImage,
              ImageHandle
              );
+  }
+
+  //
+  // If we saved image caps during load, free them now.
+  //
+  Status = gBS->HandleProtocol (
+                  ImageHandle,
+                  &mOcImageLoaderCapsProtocolGuid,
+                  (VOID **)&OcImageLoaderCaps
+                  );
+  if (!EFI_ERROR (Status)) {
+    Status = gBS->UninstallMultipleProtocolInterfaces (
+                    ImageHandle,
+                    &mOcImageLoaderCapsProtocolGuid,
+                    OcImageLoaderCaps,
+                    NULL
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    FreePool (OcImageLoaderCaps);
   }
 
   return mOriginalEfiUnloadImage (ImageHandle);
