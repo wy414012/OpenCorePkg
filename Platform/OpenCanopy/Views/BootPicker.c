@@ -56,6 +56,12 @@ STATIC UINT32  mBootPickerLabelScrollHoldTime = 0;
 
 STATIC GUI_OBJ  *mBootPickerFocusList[] = {
   &mBootPicker.Hdr.Obj,
+  &mCommonShutDown.Hdr.Obj,
+  &mCommonRestart.Hdr.Obj
+};
+
+STATIC GUI_OBJ  *mBootPickerFocusListReversed[] = {
+  &mBootPicker.Hdr.Obj,
   &mCommonRestart.Hdr.Obj,
   &mCommonShutDown.Hdr.Obj
 };
@@ -1318,6 +1324,18 @@ GLOBAL_REMOVE_IF_UNREFERENCED GUI_VIEW_CONTEXT  mBootPickerViewContext = {
   ARRAY_SIZE (mBootPickerFocusList)
 };
 
+GLOBAL_REMOVE_IF_UNREFERENCED GUI_VIEW_CONTEXT  mBootPickerViewContextReversed = {
+  InternalCommonViewDraw,
+  InternalCommonViewPtrEvent,
+  ARRAY_SIZE (mBootPickerViewChildren),
+  mBootPickerViewChildren,
+  InternalBootPickerViewKeyEvent,
+  InternalGetCursorImage,
+  InternalBootPickerExitLoop,
+  mBootPickerFocusListReversed,
+  ARRAY_SIZE (mBootPickerFocusListReversed)
+};
+
 GLOBAL_REMOVE_IF_UNREFERENCED GUI_VIEW_CONTEXT  mBootPickerViewContextMinimal = {
   InternalCommonViewDraw,
   InternalCommonViewPtrEvent,
@@ -1337,6 +1355,11 @@ CopyLabel (
   IN  CONST GUI_IMAGE  *Source
   )
 {
+  if (Source->Buffer == NULL) {
+    ASSERT (FALSE);
+    return EFI_UNSUPPORTED;
+  }
+
   Destination->Width  = Source->Width;
   Destination->Height = Source->Height;
   Destination->Buffer = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *)AllocateCopyPool (
@@ -1680,6 +1703,8 @@ InternalBootPickerAnimateImageList (
   return FALSE;
 }
 
+STATIC UINT32  mPrevSine;
+
 STATIC GUI_INTERPOLATION  mBpAnimInfoSinMove = {
   GuiInterpolTypeSmooth,
   0,
@@ -1700,6 +1725,8 @@ InitBpAnimIntro (
   //        mBootPickerContainer between animation initialisation and start.
   //
   mBootPickerContainer.Obj.OffsetX += 35 * DrawContext->Scale;
+
+  mPrevSine = 0;
 }
 
 BOOLEAN
@@ -1709,8 +1736,6 @@ InternalBootPickerAnimateIntro (
   IN     UINT64                   CurrentTime
   )
 {
-  STATIC UINT32  PrevSine = 0;
-
   UINT8   Opacity;
   UINT32  InterpolVal;
   UINT32  DeltaSine;
@@ -1755,9 +1780,9 @@ InternalBootPickerAnimateIntro (
   }
 
   InterpolVal                       = GuiGetInterpolatedValue (&mBpAnimInfoSinMove, CurrentTime);
-  DeltaSine                         = InterpolVal - PrevSine;
+  DeltaSine                         = InterpolVal - mPrevSine;
   mBootPickerContainer.Obj.OffsetX -= DeltaSine;
-  PrevSine                          = InterpolVal;
+  mPrevSine                         = InterpolVal;
   //
   // Draw the full dimension of the inner container to implicitly cover the
   // scroll buttons with the off-screen entries.
@@ -1870,7 +1895,10 @@ BootPickerViewInitialize (
     DrawContext,
     GuiContext,
     (GuiContext->PickerContext->PickerAttributes & OC_ATTR_USE_MINIMAL_UI) == 0
-      ? &mBootPickerViewContext
+      ? ((GuiContext->PickerContext->PickerAttributes & OC_ATTR_USE_REVERSED_UI) == 0
+        ? &mBootPickerViewContext
+        : &mBootPickerViewContextReversed
+         )
       : &mBootPickerViewContextMinimal
     );
 
@@ -2000,7 +2028,7 @@ BootPickerViewInitialize (
 
   InitializeListHead (&mBootPickerLabelAnimation.Link);
 
-  if (!GuiContext->DoneIntroAnimation) {
+  if (GuiContext->UseMenuEaseIn) {
     InitBpAnimIntro (DrawContext);
     InsertHeadList (&DrawContext->Animations, &mBootPickerIntroAnimation.Link);
     //
@@ -2009,8 +2037,6 @@ BootPickerViewInitialize (
     mBootPickerContainer.Obj.Opacity       = 0;
     mBootPickerLeftScroll.Hdr.Obj.Opacity  = 0;
     mBootPickerRightScroll.Hdr.Obj.Opacity = 0;
-
-    GuiContext->DoneIntroAnimation = TRUE;
   } else {
     //
     // The late code assumes the scroll buttons are visible by default.
@@ -2023,7 +2049,9 @@ BootPickerViewInitialize (
     mCommonActionButtonsContainer.Obj.Opacity = 0xFF;
   }
 
-  if (DrawContext->TimeOutSeconds > 0) {
+  if (  !GuiContext->PickerContext->PickerAudioAssist
+     && (DrawContext->TimeOutSeconds > 0))
+  {
     STATIC GUI_ANIMATION  PickerAnim2;
     PickerAnim2.Context = NULL;
     PickerAnim2.Animate = InternalBootPickerAnimateTimeout;
