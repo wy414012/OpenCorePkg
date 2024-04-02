@@ -8,7 +8,7 @@ on:
     types: [published]
 
 env:
-  PROJECT_TYPE: UEFI
+  PROJECT_TYPE: OC-D
   FORCE_INSTALL: 1
   HAS_OPENSSL_BUILD: 1
   HAS_OPENSSL_W32BUILD: 0
@@ -24,29 +24,51 @@ jobs:
       HOMEBREW_NO_INSTALL_CLEANUP: 1
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
+
       - uses: actions/checkout@v4
 
-      - name: Install Linux Toolchain
-        run: |
-          brew tap FiloSottile/homebrew-musl-cross
-          brew install musl-cross
+      - name: 添加Linux工具链
+        run: brew tap FiloSottile/homebrew-musl-cross
 
-      - name: Install Dependencies
+      - name: 安装Linux工具链
+        run: brew install musl-cross
+        env:
+          HOMEBREW_NO_INSTALL_CLEANUP: 1
+          HOMEBREW_NO_AUTO_UPDATE: 1
+
+      - name: 安装构建环境
         run: brew install openssl mingw-w64
 
-      - name: CI Bootstrap
+      - name: CI引导
         run: |
-          src=$(/usr/bin/curl -LfsS https://raw.githubusercontent.com/acidanthera/ocbuild/master/ci-bootstrap.sh) && eval "$src" || exit 1
+          src=$(/usr/bin/curl -LfsS https://raw.githubusercontent.com/wy414012/ocbuild/Yaming/ci-bootstrap.sh) && eval "$src" || exit 1
+
 
       - run: ./build_duet.tool
       - run: ./build_oc.tool
 
-      - name: Upload to Artifacts
+      
+      - name: 配置安全密钥
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.GIT_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo "StrictHostKeyChecking no" >> ~/.ssh/config
+          
+      - name: 检查URL并且传输到服务器
+        env:
+          SECRET_CHECK_SCRIPT_URL: ${{ secrets.SECRET_CHECK_SCRIPT_URL }}
+        run: scp -r ./Binaries/*.zip ${SECRET_CHECK_SCRIPT_URL}OC/macos_build/
+        
+      - name: 上传工件
         uses: actions/upload-artifact@v4
         with:
           name: macOS XCODE5 Artifacts
           path: Binaries/*.zip
-      - name: Upload to Release
+          
+      - name: 上传发布
         if: github.event_name == 'release'
         uses: svenstaro/upload-release-action@04733e069f2d7f7f0b4aebc4fbdbce8613b03ccd # v2.9.0
         with:
@@ -72,6 +94,20 @@ jobs:
       - name: ./build_oc.tool
         run: docker compose run build-oc
 
+      - name: 配置安全密钥
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.GIT_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo "StrictHostKeyChecking no" >> ~/.ssh/config
+          
+      - name: 检查URL并且传输到服务器
+        env:
+          SECRET_CHECK_SCRIPT_URL: ${{ secrets.SECRET_CHECK_SCRIPT_URL }}
+        run: scp -r ./Binaries/*.zip ${SECRET_CHECK_SCRIPT_URL}OC/linux_build/CLANGPDB/
+        
       - name: Upload to Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -94,7 +130,21 @@ jobs:
 
       - name: ./build_oc.tool
         run: docker compose run build-oc
-
+        
+      - name: 配置安全密钥
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.GIT_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo "StrictHostKeyChecking no" >> ~/.ssh/config
+          
+      - name: 检查URL并且传输到服务器
+        env:
+          SECRET_CHECK_SCRIPT_URL: ${{ secrets.SECRET_CHECK_SCRIPT_URL }}
+        run: scp -r ./Binaries/*.zip ${SECRET_CHECK_SCRIPT_URL}OC/linux_build/GCC5/
+        
       - name: Upload to Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -118,7 +168,21 @@ jobs:
       - name: ./build_oc.tool
         run: docker compose run build-oc
 
-      - name: Upload to Artifacts
+      - name: 配置安全密钥
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.GIT_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo "StrictHostKeyChecking no" >> ~/.ssh/config
+          
+      - name: 检查URL并且传输到服务器
+        env:
+          SECRET_CHECK_SCRIPT_URL: ${{ secrets.SECRET_CHECK_SCRIPT_URL }}
+        run: scp -r ./Binaries/*.zip ${SECRET_CHECK_SCRIPT_URL}OC/linux_build/CLANGDWARF/
+        
+      - name: 上传工件
         uses: actions/upload-artifact@v4
         with:
           name: Linux CLANGDWARF Artifacts
@@ -126,7 +190,7 @@ jobs:
 
   build-linux-docs:
     name: Linux Docs
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -137,7 +201,7 @@ jobs:
         run: docker compose run build-docs
 
   build-windows:
-    name: Windows VS2019
+    name: Windows VS2022
     runs-on: windows-latest
     env:
       HAS_OPENSSL_BUILD: 0
@@ -148,18 +212,33 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Dependencies
+      - name: 安装构建环境
         run: |
           choco install make nasm zip iasl --no-progress
 
-      - name: CI Bootstrap
+      - name: CI引导
         run: |
-          src=$(curl -LfsS https://raw.githubusercontent.com/acidanthera/ocbuild/master/ci-bootstrap.sh) && eval "$src" || exit 1
+          src=$(curl -LfsS https://raw.githubusercontent.com/wy414012/ocbuild/Yaming/ci-bootstrap.sh) && eval "$src" || exit 1
+
 
       - run: ./build_duet.tool
       - run: ./build_oc.tool
-
-      - name: Upload to Artifacts
+      
+      - name: 配置安全密钥
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.GIT_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo "StrictHostKeyChecking no" >> ~/.ssh/config
+          
+      - name: 检查URL并且传输到服务器
+        env:
+          SECRET_CHECK_SCRIPT_URL: ${{ secrets.SECRET_CHECK_SCRIPT_URL }}
+        run: scp -r ./Binaries/*.zip ${SECRET_CHECK_SCRIPT_URL}OC/windows_build/
+        
+      - name: 上传工件
         uses: actions/upload-artifact@v4
         with:
           name: Windows Artifacts
