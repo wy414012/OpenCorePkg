@@ -14,7 +14,11 @@
 ##
 
   BlockSize          = 0x10000
-  NumBlocks          = 22
+!if ($(TARGET) == NOOPT)
+  NumBlocks          = 0x24       #GenFv image size 0x240000
+!else
+  NumBlocks          = 0xd        #GenFv image size 0xd0000
+!endif
   FvAlignment        = 16         #FV alignment and FV attributes setting.
   ERASE_POLARITY     = 1
   MEMORY_MAPPED      = TRUE
@@ -33,6 +37,7 @@
   READ_LOCK_STATUS   = TRUE
 
   APRIORI DXE {
+    INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
     INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
     INF  OvmfPkg/8259InterruptControllerDxe/8259.inf
   }
