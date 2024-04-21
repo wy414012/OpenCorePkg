@@ -6,6 +6,11 @@ OpenCore Changelog
 - Added Apple Silicon support in all provided utilities
 - Utilities now require macOS 10.9+ (OpenCore itself still supports macOS 10.4+)
 - Added `AllowRelocationBlock` support for 32-bit version
+- Enabled additional serial logging in non-RELEASE builds of OpenDuet
+- Added missing DxeCore ImageContext HOB in OpenDuet
+- Fixed assert caused by dependency ordering in OpenDuet
+- Prevented assert in normal situation when freeing memory above 4GB in OpenDuet
+- Prevented debug assert reporting that optional Hii protocols are not present in OpenDuet
 
 #### v0.9.9
 - Fixed incorrect warning in ocvalidate
