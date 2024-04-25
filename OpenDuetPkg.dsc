@@ -146,8 +146,6 @@
       DxeServicesTableLib|MdeModulePkg/Library/DxeCoreDxeServicesTableLib/DxeCoreDxeServicesTableLib.inf
       UefiBootServicesTableLib|MdeModulePkg/Library/DxeCoreUefiBootServicesTableLib/DxeCoreUefiBootServicesTableLib.inf
       UefiRuntimeServicesTableLib|MdeModulePkg/Library/DxeCoreUefiRuntimeServicesTableLib/DxeCoreUefiRuntimeServicesTableLib.inf
-    <PcdsFixedAtBuild>
-      gEfiMdePkgTokenSpaceGuid.PcdUefiImageFormatSupportFv|0x03
   }
 
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
@@ -182,7 +180,10 @@
   MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
   OpenCorePkg/Legacy/BootPlatform/SmbiosGenDxe/SmbiosGen.inf
 
+!if $(TARGET) != NOOPT
+  # We will reuse DEBUG EfiLdr in NOOPT build to keep within allotted 0x10000-0x20000 space.
   OpenCorePkg/Legacy/BootPlatform/EfiLdr/EfiLdr.inf
+!endif
   OpenCorePkg/Legacy/BootPlatform/BdsDxe/BdsDxe.inf {
     <LibraryClasses>
       PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
@@ -290,8 +291,8 @@
   gEfiMdePkgTokenSpaceGuid.PcdImageLoaderAllowMisalignedOffset|TRUE
 
 [BuildOptions]
-  MSFT:NOOPT_*_*_CC_FLAGS    = -D OC_TARGET_RELEASE=1 /FAcs -Dinline=__inline  /GS /kernel
-  MSFT:DEBUG_*_*_CC_FLAGS    = -D OC_TARGET_RELEASE=1 /FAcs -Dinline=__inline -DMDEPKG_NDEBUG /GS /kernel
+  MSFT:NOOPT_*_*_CC_FLAGS    = -D OC_TARGET_RELEASE=1 /FAcs -Dinline=__inline /GS /kernel
+  MSFT:DEBUG_*_*_CC_FLAGS    = -D OC_TARGET_RELEASE=1 /FAcs -Dinline=__inline /GS /kernel
   MSFT:RELEASE_*_*_CC_FLAGS  = -D OC_TARGET_RELEASE=1 /FAcs -Dinline=__inline -DMDEPKG_NDEBUG /GS /kernel
 
   XCODE:NOOPT_*_*_CC_FLAGS   = -D OC_TARGET_RELEASE=1 -fno-unwind-tables -O0 -fstack-protector-strong -ftrivial-auto-var-init=pattern
@@ -299,9 +300,9 @@
   XCODE:RELEASE_*_*_CC_FLAGS = -D OC_TARGET_RELEASE=1 -fno-unwind-tables -flto -Os -DMDEPKG_NDEBUG -fstack-protector-strong -ftrivial-auto-var-init=pattern
 
   GCC:NOOPT_*_*_CC_FLAGS     = -D OC_TARGET_RELEASE=1 -Wno-unused-but-set-variable -fstack-protector-strong -mstack-protector-guard=global -Wuninitialized
-  GCC:DEBUG_*_*_CC_FLAGS     = -D OC_TARGET_RELEASE=1 -DMDEPKG_NDEBUG -Wno-unused-but-set-variable -fstack-protector-strong -mstack-protector-guard=global -Wuninitialized
+  GCC:DEBUG_*_*_CC_FLAGS     = -D OC_TARGET_RELEASE=1 -Wno-unused-but-set-variable -fstack-protector-strong -mstack-protector-guard=global -Wuninitialized
   GCC:RELEASE_*_*_CC_FLAGS   = -D OC_TARGET_RELEASE=1 -DMDEPKG_NDEBUG -Wno-unused-but-set-variable -fstack-protector-strong -mstack-protector-guard=global -Wuninitialized
 
   CLANGGCC:NOOPT_*_*_CC_FLAGS     = -D OC_TARGET_RELEASE=1 -Wno-unused-but-set-variable -fstack-protector-strong -mstack-protector-guard=global -Wuninitialized
-  CLANGGCC:DEBUG_*_*_CC_FLAGS     = -D OC_TARGET_RELEASE=1 -DMDEPKG_NDEBUG -Wno-unused-but-set-variable -fstack-protector-strong -mstack-protector-guard=global -Wuninitialized
+  CLANGGCC:DEBUG_*_*_CC_FLAGS     = -D OC_TARGET_RELEASE=1 -Wno-unused-but-set-variable -fstack-protector-strong -mstack-protector-guard=global -Wuninitialized
   CLANGGCC:RELEASE_*_*_CC_FLAGS   = -D OC_TARGET_RELEASE=1 -DMDEPKG_NDEBUG -Wno-unused-but-set-variable -fstack-protector-strong -mstack-protector-guard=global -Wuninitialized
