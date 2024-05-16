@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+env:
+  PROJECT_TYPE: OC-D
+  FORCE_INSTALL: 1
+  HAS_OPENSSL_BUILD: 1
+  HAS_OPENSSL_W32BUILD: 0
+  WERROR: 1
+
+jobs:
+  host-build:
+    name: host-test
+    runs-on: self-hosted
+    env:
+      JOB_TYPE: BUILD
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - name: 添加Linux工具链
+        run: brew tap FiloSottile/homebrew-musl-cross
+
+      - name: 安装Linux工具链
+        run: brew install musl-cross
+        env:
+          HOMEBREW_NO_INSTALL_CLEANUP: 1
+          HOMEBREW_NO_AUTO_UPDATE: 1
+
+      - name: 安装构建环境
+        run: brew install openssl mingw-w64
+
+      - name: CI引导
+        run: |
+          src=$(/usr/bin/curl -LfsS https://raw.githubusercontent.com/wy414012/ocbuild/Yaming/ci-bootstrap.sh) && eval "$src" || exit 1
+
+      - run: ./build_duet.tool
+      - run: ./build_oc.tool
+ 
+      - name: Artifacts test
+        uses: actions/upload-artifact@v4
+        with:
+          name: macOS XCODE5 Artifacts test
+          path: Binaries/*.zip
+          

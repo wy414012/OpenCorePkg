@@ -1,4 +1,4 @@
-name: Build
+name: CI
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
     types: [published]
 
 env:
-  PROJECT_TYPE: OC-D
+  PROJECT_TYPE: UEFI
   FORCE_INSTALL: 1
   HAS_OPENSSL_BUILD: 1
   HAS_OPENSSL_W32BUILD: 0
